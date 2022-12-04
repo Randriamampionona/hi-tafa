@@ -1,0 +1,4 @@
+greenBlue: #29ad7d
+darkBlue: #1e3144
+lightWhite: #f5f5f5
+darkWhite: #e6eaeb
