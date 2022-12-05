@@ -19,7 +19,8 @@ const ProfileBar = ({ profileImg, username, email, isChatBox }) => {
 					alt={username}
 					width={52}
 					height={52}
-					placeholder="blur"
+					// placeholder="blur"
+					// blurDataURL={profileImg}
 					style={{ objectFit: "cover" }}
 					className="rounded-full border-2 border-greenBlue"
 				/>

@@ -5,14 +5,48 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { FaSignInAlt, FaUserCircle, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/router";
+import {
+	useCreateUserWithEmailAndPassword,
+	useSignInWithEmailAndPassword,
+	useUpdateProfile,
+	useSignInWithGoogle,
+	useSignInWithGithub,
+} from "react-firebase-hooks/auth";
+import { auth } from "../../lib/firebase.config";
+import { ImSpinner2 } from "react-icons/im";
+import RequireNoAuth from "../_requireNoAuth";
 
 const initState = {
 	inputs: { email: "", password: "" },
+	userInfos: {
+		displayName: "unknown",
+		photoURL:
+			"https://w7.pngwing.com/pngs/754/2/png-transparent-samsung-galaxy-a8-a8-user-login-telephone-avatar-pawn-blue-angle-sphere-thumbnail.png",
+	},
 };
 
 const AuthorizationPage = () => {
+	const [
+		createUserWithEmailAndPassword,
+		createdUser,
+		creadedLoading,
+		createdError,
+	] = useCreateUserWithEmailAndPassword(auth);
+
+	const [signInWithEmailAndPassword, signedUser, signedLoading, signedError] =
+		useSignInWithEmailAndPassword(auth);
+
+	const [signInWithGoogle, goolgeUser, goolgeLoading, goolgeError] =
+		useSignInWithGoogle(auth);
+
+	const [signInWithGithub, githubUser, githubLoading, githubError] =
+		useSignInWithGithub(auth);
+
+	const [updateProfile, updating, error] = useUpdateProfile(auth);
+
 	const [hasAccount, setHasAccount] = useState(true);
 	const [inputVal, setInputVal] = useState(initState.inputs);
+	const [defaultInfos] = useState(initState.userInfos);
 	const { replace } = useRouter();
 
 	const changeHandler = (e) => {
@@ -25,7 +59,33 @@ const AuthorizationPage = () => {
 	const submitHandler = async (e) => {
 		e.preventDefault();
 
-		replace("/");
+		if (hasAccount) {
+			try {
+				await signInWithEmailAndPassword(
+					inputVal.email,
+					inputVal.password
+				);
+
+				replace("/");
+			} catch (error) {
+				console.log(error);
+			}
+		} else {
+			try {
+				const result = await createUserWithEmailAndPassword(
+					inputVal.email,
+					inputVal.password
+				);
+
+				if (result) {
+					await updateProfile({ ...defaultInfos });
+
+					replace("/");
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		}
 	};
 
 	return (
@@ -49,6 +109,26 @@ const AuthorizationPage = () => {
 					<div className="pb-4">
 						<h1 className="text-3xl font-bold">
 							{hasAccount ? "Sign In" : "Sign Up"}
+							{createdError && (
+								<p className="text-xs text-red-500">
+									{createdError.message}
+								</p>
+							)}
+							{signedError && (
+								<p className="text-xs text-red-500">
+									{signedError.message}
+								</p>
+							)}
+							{goolgeError && (
+								<p className="text-xs text-red-500">
+									{goolgeError.message}
+								</p>
+							)}
+							{githubError && (
+								<p className="text-xs text-red-500">
+									{githubError.message}
+								</p>
+							)}
 						</h1>
 					</div>
 
@@ -97,10 +177,24 @@ const AuthorizationPage = () => {
 					</div>
 
 					<button className="flex items-center justify-center gap-x-3 w-full bg-greenBlue text-lightWhite rounded h-11 shadow hover:bg-greenBlue/90">
-						<span>
-							{hasAccount ? <FaSignInAlt /> : <FaUserCircle />}
-						</span>
-						<span>{hasAccount ? "Sing In" : "Sign Up"}</span>
+						{creadedLoading || signedLoading ? (
+							<span className="animate-spin">
+								<ImSpinner2 />
+							</span>
+						) : (
+							<>
+								<span>
+									{hasAccount ? (
+										<FaSignInAlt />
+									) : (
+										<FaUserCircle />
+									)}
+								</span>
+								<span>
+									{hasAccount ? "Sing In" : "Sign Up"}
+								</span>
+							</>
+						)}
 					</button>
 
 					<SwitchForm
@@ -114,27 +208,50 @@ const AuthorizationPage = () => {
 							or
 						</span>
 					</div>
-
-					<div className="w-full space-y-2">
-						<button
-							type="button"
-							className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90">
-							<span>
-								<FcGoogle />
-							</span>
-							<span>Continue with Google</span>
-						</button>
-
-						<button
-							type="button"
-							className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90">
-							<span>
-								<FaGithub />
-							</span>
-							<span>Continue with GitHub</span>
-						</button>
-					</div>
 				</form>
+
+				{/* providers */}
+				<div className="w-full space-y-2">
+					<button
+						type="button"
+						className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90"
+						onClick={(e) =>
+							signInWithGoogle().then(() => replace("/"))
+						}>
+						{goolgeLoading ? (
+							<span className="animate-spin">
+								<ImSpinner2 />
+							</span>
+						) : (
+							<>
+								<span>
+									<FcGoogle />
+								</span>
+								<span>Continue with Google</span>
+							</>
+						)}
+					</button>
+
+					<button
+						type="button"
+						className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90"
+						onClick={(e) =>
+							signInWithGithub().then(() => replace("/"))
+						}>
+						{githubLoading ? (
+							<span className="animate-spin">
+								<ImSpinner2 />
+							</span>
+						) : (
+							<>
+								<span>
+									<FaGithub />
+								</span>
+								<span>Continue with GitHub</span>
+							</>
+						)}
+					</button>
+				</div>
 
 				<p className="text-xs">
 					&copy; 2022 From{" "}
@@ -151,7 +268,7 @@ const AuthorizationPage = () => {
 	);
 };
 
-export default AuthorizationPage;
+export default RequireNoAuth(AuthorizationPage);
 
 const LabelInput = ({ labelFor, labelText, required }) => {
 	return (

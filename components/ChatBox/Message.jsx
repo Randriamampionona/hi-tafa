@@ -4,8 +4,6 @@ import Image from "next/image";
 const Message = ({ messageOwner, message, date }) => {
 	const [sender] = useState("toojrtn@gmail.com");
 
-	console.log(messageOwner.email, sender);
-
 	return (
 		<div
 			className={`flex items-start gap-x-3 w-full px-2 ${
