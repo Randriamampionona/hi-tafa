@@ -13,11 +13,9 @@ const ChatList = ({ list }) => {
 			<ProfileSlider />
 
 			<div>
-				{[...list]
-					?.sort(() => Math.random() - 0.5)
-					.map((chat) => (
-						<Chat key={chat.username} chat={chat} />
-					))}
+				{list.map((chat) => (
+					<Chat key={chat.username} chat={chat} />
+				))}
 			</div>
 		</div>
 	);

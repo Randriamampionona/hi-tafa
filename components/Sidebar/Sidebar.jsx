@@ -1,29 +1,24 @@
-import React from "react";
 import { ProfileBar } from "../common";
 import ChatList from "./ChatList";
 import Footer from "./Footer";
-import me from "../../public/assets/me.png";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../lib/firebase.config";
-
-const defaultInfos = {
-	displayName: "unknown",
-	photoURL:
-		"https://w7.pngwing.com/pngs/754/2/png-transparent-samsung-galaxy-a8-a8-user-login-telephone-avatar-pawn-blue-angle-sphere-thumbnail.png",
-};
+import { AuthContext } from "../../store/context/AuthContext";
+import { GlobalContext } from "../../store/context/GlobalContext";
 
 const Sidebar = () => {
-	const [currentUser, loading, error] = useAuthState(auth);
-
-	if (loading) return <p>Loading...</p>;
-	if (error) return <p>{error.message}</p>;
+	const { isSidebarOpen } = GlobalContext();
+	const { currentUser } = AuthContext();
 
 	return (
-		<aside className="grid grid-rows-asideGrid bg-darkBlue text-lightWhite max-w-full w-full h-screen md:max-w-sm">
+		<aside
+			className={`grid grid-rows-asideGrid bg-darkBlue text-lightWhite max-w-full w-full h-screen overflow-hidden md:max-w-[24rem] md:min-w-[24rem] ${
+				isSidebarOpen
+					? "min-w-[100vw] max-w-[100vw]"
+					: "min-w-0 max-w-0"
+			}`}>
 			<ProfileBar
-				username={currentUser?.displayName || defaultInfos.displayName}
+				username={currentUser?.displayName}
 				email={currentUser?.email}
-				profileImg={currentUser?.photoURL || defaultInfos.photoURL}
+				profileImg={currentUser?.photoURL}
 			/>
 			<ChatList />
 			<Footer />

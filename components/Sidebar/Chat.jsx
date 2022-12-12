@@ -1,9 +1,14 @@
 import React from "react";
 import Image from "next/image";
+import { GlobalContext } from "../../store/context/GlobalContext";
 
 const Chat = ({ chat }) => {
+	const { toogleSidebar } = GlobalContext();
+
 	return (
-		<div className="flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10">
+		<div
+			className="flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10"
+			onClick={() => toogleSidebar()}>
 			<Image
 				src={chat.img}
 				alt={chat.username}

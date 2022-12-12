@@ -1,23 +1,20 @@
 import { FaCog, FaSignOutAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
-import { useSignOut } from "react-firebase-hooks/auth";
-import { auth } from "../../lib/firebase.config";
-import { useRouter } from "next/router";
+import { AuthContext } from "../../store/context/AuthContext";
 
 const Footer = () => {
-	const [signOut, loading, error] = useSignOut(auth);
-	const { replace } = useRouter();
+	const { authLoading, signoutFunc } = AuthContext();
 
-	if (error) console.log(error);
+	const signoutHandler = async () => {
+		await signoutFunc();
+	};
 
 	return (
 		<div className="flex items-center justify-center gap-x-3 px-3 py-1 bg-[#21364b]">
 			<button
 				className="flex-grow flex items-center justify-center gap-x-3 rounded py-2 hover:bg-darkWhite/20"
-				onClick={(e) =>
-					signOut().then(() => replace("/authorization"))
-				}>
-				{loading ? (
+				onClick={signoutHandler}>
+				{authLoading.signout ? (
 					<span className="animate-spin">
 						<ImSpinner2 />
 					</span>

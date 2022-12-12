@@ -7,13 +7,18 @@ import me from "../../public/assets/me.png";
 import fy from "../../public/assets/profile/Fy Hyung.png";
 import picture from "../../public/assets/picture.jpg";
 import UploadPopup from "./UploadPopup";
+import { GlobalContext } from "../../store/context/GlobalContext";
 
 const ChatBox = ({ mockMessage }) => {
+	const { isSidebarOpen } = GlobalContext();
 	const [message, setMessage] = useState(mockMessage);
 	const [openPopup, setOpenPopup] = useState(false);
 
 	return (
-		<section className="flex-grow flex-shrink grid grid-rows-asideGrid max-h-screen overflow-hidden text-darkBlue bg-[#e9ecee]">
+		<section
+			className={`flex-grow flex-shrink grid grid-rows-asideGrid max-h-screen overflow-hidden text-darkBlue bg-[#e9ecee] sm:relative ${
+				!isSidebarOpen ? "" : ""
+			}`}>
 			{openPopup && (
 				<UploadPopup
 					setOpenPopup={setOpenPopup}

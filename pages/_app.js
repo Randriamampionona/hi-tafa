@@ -1,11 +1,17 @@
 import "../styles/globals.css";
 import { Layout } from "./../components/Layout";
+import { AuthProvider } from "../store/context/AuthContext";
+import { GlobalProvider } from "../store/context/GlobalContext";
 
 const MyApp = ({ Component, pageProps }) => {
 	return (
-		<Layout>
-			<Component {...pageProps} />
-		</Layout>
+		<GlobalProvider>
+			<AuthProvider>
+				<Layout>
+					<Component {...pageProps} />
+				</Layout>
+			</AuthProvider>
+		</GlobalProvider>
 	);
 };
 

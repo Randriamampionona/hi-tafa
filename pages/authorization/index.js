@@ -2,52 +2,24 @@ import { useState } from "react";
 import Image from "next/image";
 import logo from "../../public/assets/logo.png";
 import { FiMail, FiLock } from "react-icons/fi";
-import { FaSignInAlt, FaUserCircle, FaGithub } from "react-icons/fa";
+import { FaSignInAlt, FaUserCircle, FaUser, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { useRouter } from "next/router";
-import {
-	useCreateUserWithEmailAndPassword,
-	useSignInWithEmailAndPassword,
-	useUpdateProfile,
-	useSignInWithGoogle,
-	useSignInWithGithub,
-} from "react-firebase-hooks/auth";
-import { auth } from "../../lib/firebase.config";
 import { ImSpinner2 } from "react-icons/im";
-import RequireNoAuth from "../_requireNoAuth";
+import { AuthContext } from "../../store/context/AuthContext";
 
 const initState = {
-	inputs: { email: "", password: "" },
-	userInfos: {
-		displayName: "unknown",
-		photoURL:
-			"https://w7.pngwing.com/pngs/754/2/png-transparent-samsung-galaxy-a8-a8-user-login-telephone-avatar-pawn-blue-angle-sphere-thumbnail.png",
+	inputs: {
+		username: "",
+		email: "",
+		password: "",
 	},
 };
 
 const AuthorizationPage = () => {
-	const [
-		createUserWithEmailAndPassword,
-		createdUser,
-		creadedLoading,
-		createdError,
-	] = useCreateUserWithEmailAndPassword(auth);
-
-	const [signInWithEmailAndPassword, signedUser, signedLoading, signedError] =
-		useSignInWithEmailAndPassword(auth);
-
-	const [signInWithGoogle, goolgeUser, goolgeLoading, goolgeError] =
-		useSignInWithGoogle(auth);
-
-	const [signInWithGithub, githubUser, githubLoading, githubError] =
-		useSignInWithGithub(auth);
-
-	const [updateProfile, updating, error] = useUpdateProfile(auth);
-
+	const { authLoading, signupFunc, signinFunc, signinWithProviderFunc } =
+		AuthContext();
 	const [hasAccount, setHasAccount] = useState(true);
 	const [inputVal, setInputVal] = useState(initState.inputs);
-	const [defaultInfos] = useState(initState.userInfos);
-	const { replace } = useRouter();
 
 	const changeHandler = (e) => {
 		setInputVal((prev) => ({
@@ -60,31 +32,13 @@ const AuthorizationPage = () => {
 		e.preventDefault();
 
 		if (hasAccount) {
-			try {
-				await signInWithEmailAndPassword(
-					inputVal.email,
-					inputVal.password
-				);
-
-				replace("/");
-			} catch (error) {
-				console.log(error);
-			}
+			await signinFunc(inputVal.email, inputVal.password);
 		} else {
-			try {
-				const result = await createUserWithEmailAndPassword(
-					inputVal.email,
-					inputVal.password
-				);
-
-				if (result) {
-					await updateProfile({ ...defaultInfos });
-
-					replace("/");
-				}
-			} catch (error) {
-				console.log(error);
-			}
+			await signupFunc(
+				inputVal.username,
+				inputVal.email,
+				inputVal.password
+			);
 		}
 	};
 
@@ -95,10 +49,10 @@ const AuthorizationPage = () => {
 					src={logo}
 					alt="Hi-Tafa"
 					placeholder="blur"
-					objectFit="cover"
 					title="Become a member and start a conversation with people around
 					you."
 					className="group-hover:animate-pulse"
+					style={{ objectFit: "cover" }}
 				/>
 			</div>
 
@@ -109,28 +63,32 @@ const AuthorizationPage = () => {
 					<div className="pb-4">
 						<h1 className="text-3xl font-bold">
 							{hasAccount ? "Sign In" : "Sign Up"}
-							{createdError && (
-								<p className="text-xs text-red-500">
-									{createdError.message}
-								</p>
-							)}
-							{signedError && (
-								<p className="text-xs text-red-500">
-									{signedError.message}
-								</p>
-							)}
-							{goolgeError && (
-								<p className="text-xs text-red-500">
-									{goolgeError.message}
-								</p>
-							)}
-							{githubError && (
-								<p className="text-xs text-red-500">
-									{githubError.message}
-								</p>
-							)}
 						</h1>
 					</div>
+
+					{!hasAccount && (
+						<div className="flex flex-col w-full">
+							<LabelInput
+								labelFor={"username"}
+								labelText={"Username"}
+								required
+							/>
+							<div className="flex items-center justify-between p-3 border border-darkBlue/20 rounded focus-within:border-greenBlue">
+								<span className="text-darkBlue/40">
+									<FaUser />
+								</span>
+								<input
+									required
+									type="text"
+									name="username"
+									placeholder="Username"
+									className="flex-grow outline-0 border-0 px-2"
+									value={inputVal.username}
+									onChange={changeHandler}
+								/>
+							</div>
+						</div>
+					)}
 
 					<div className="flex flex-col w-full">
 						<LabelInput
@@ -177,7 +135,7 @@ const AuthorizationPage = () => {
 					</div>
 
 					<button className="flex items-center justify-center gap-x-3 w-full bg-greenBlue text-lightWhite rounded h-11 shadow hover:bg-greenBlue/90">
-						{creadedLoading || signedLoading ? (
+						{authLoading.signin || authLoading.signup ? (
 							<span className="animate-spin">
 								<ImSpinner2 />
 							</span>
@@ -202,6 +160,7 @@ const AuthorizationPage = () => {
 						setHasAccount={setHasAccount}
 					/>
 
+					{/* or */}
 					<div className="relative w-full my-4">
 						<hr />
 						<span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2">
@@ -215,10 +174,10 @@ const AuthorizationPage = () => {
 					<button
 						type="button"
 						className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90"
-						onClick={(e) =>
-							signInWithGoogle().then(() => replace("/"))
+						onClick={async (e) =>
+							await signinWithProviderFunc("google")
 						}>
-						{goolgeLoading ? (
+						{authLoading.google ? (
 							<span className="animate-spin">
 								<ImSpinner2 />
 							</span>
@@ -235,10 +194,10 @@ const AuthorizationPage = () => {
 					<button
 						type="button"
 						className="flex items-center justify-center gap-x-3 w-full bg-darkBlue text-lightWhite rounded h-11 shadow hover:bg-darkBlue/90"
-						onClick={(e) =>
-							signInWithGithub().then(() => replace("/"))
+						onClick={async (e) =>
+							await signinWithProviderFunc("github")
 						}>
-						{githubLoading ? (
+						{authLoading.github ? (
 							<span className="animate-spin">
 								<ImSpinner2 />
 							</span>
@@ -254,7 +213,7 @@ const AuthorizationPage = () => {
 				</div>
 
 				<p className="text-xs">
-					&copy; 2022 From{" "}
+					&copy; 2022 By{" "}
 					<a
 						href="http://toojrtn.vercel.app"
 						target="_blank"
@@ -268,7 +227,7 @@ const AuthorizationPage = () => {
 	);
 };
 
-export default RequireNoAuth(AuthorizationPage);
+export default AuthorizationPage;
 
 const LabelInput = ({ labelFor, labelText, required }) => {
 	return (
