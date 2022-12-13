@@ -18,6 +18,7 @@ import {
 	serverTimestamp,
 	collection,
 	setDoc,
+	updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { GlobalContext } from "./GlobalContext";
@@ -83,9 +84,11 @@ export const AuthProvider = ({ children }) => {
 			const docRef = doc(db, "users", result?.user?.uid);
 
 			const data = {
+				userID: result?.user?.uid,
 				username: result?.user?.displayName,
 				email: result?.user?.email,
-				createdAt: serverTimestamp(),
+				img: defaultInfos.photoURL,
+				active: true,
 			};
 
 			await setDoc(docRef, data);
@@ -115,6 +118,11 @@ export const AuthProvider = ({ children }) => {
 				password
 			);
 
+			const docRef = doc(db, "users", currentUser.uid);
+			await updateDoc(docRef, {
+				active: true,
+			});
+
 			toastNotify("success", `So long ${result.user?.displayName}`);
 			replace("/");
 		} catch (error) {
@@ -134,7 +142,13 @@ export const AuthProvider = ({ children }) => {
 		}));
 
 		try {
+			const docRef = doc(db, "users", currentUser.uid);
+			await updateDoc(docRef, {
+				active: false,
+			});
+
 			await signOut(auth);
+
 			toastNotify("success", "See you soon");
 			replace("/authorization");
 		} catch (error) {
@@ -163,9 +177,11 @@ export const AuthProvider = ({ children }) => {
 			const docRef = doc(db, "users", result?.user?.uid);
 
 			const data = {
+				userID: result?.user?.uid,
 				username: result?.user?.displayName,
 				email: result?.user?.email,
-				createdAt: serverTimestamp(),
+				img: result?.user?.photoURL,
+				active: true,
 			};
 
 			await setDoc(docRef, data);

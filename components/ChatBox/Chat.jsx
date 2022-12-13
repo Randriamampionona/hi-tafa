@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Message from "./Message";
 
-const MessageList = ({ mockMessage }) => {
+const Chat = () => {
 	const scrollReff = useRef();
 
 	useEffect(() => {
@@ -9,19 +9,20 @@ const MessageList = ({ mockMessage }) => {
 			behavior: "smooth",
 			block: "end",
 		});
-	}, [mockMessage]);
+	}, []);
 
 	return (
 		<div
 			id="section__chat-box"
 			className="flex-grow grid gap-y-8 px-3 pt-3 pb-8"
 			style={{ overflowY: "overlay" }}>
-			{mockMessage?.map((message) => (
+			{/* {mockMessage?.map((message) => (
 				<Message key={message.messageID} {...message} />
-			))}
+			))} */}
+			chat here
 			<div ref={scrollReff} />
 		</div>
 	);
 };
 
-export default MessageList;
+export default Chat;

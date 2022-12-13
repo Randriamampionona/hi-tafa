@@ -1,81 +1,45 @@
-import React from "react";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { db } from "../../lib/firebase.config";
+import { AuthContext } from "../../store/context/AuthContext";
 import Chat from "./Chat";
 import ProfileSlider from "./ProfileSlider";
 import Search from "./Search";
 
-const ChatList = ({ list }) => {
+const ChatList = () => {
+	const { currentUser } = AuthContext();
+	const [chatList, setChatList] = useState([]);
+	const docRef = collection(db, "users");
+	const q = query(docRef, where("userID", "!=", currentUser?.uid || ""));
+
+	useEffect(
+		() =>
+			onSnapshot(q, (snapshot) => {
+				setChatList(
+					snapshot.docs.map((doc) => ({
+						chatID: doc.id,
+						...doc.data(),
+					}))
+				);
+			}),
+		[]
+	);
+
 	return (
 		<div
 			id="sidebar__chat-list"
 			className="space-y-3"
 			style={{ overflowY: "overlay" }}>
 			<Search />
-			<ProfileSlider />
+			<ProfileSlider chatList={chatList} />
 
 			<div>
-				{list.map((chat) => (
-					<Chat key={chat.username} chat={chat} />
+				{chatList.map((chat) => (
+					<Chat key={chat.chatID} chat={chat} />
 				))}
 			</div>
 		</div>
 	);
-};
-
-ChatList.defaultProps = {
-	list: [
-		{
-			username: "Andria Aliniaina",
-			img: "/assets/profile/Andria Aliniaina.png",
-		},
-		{
-			username: "Annick Shinary",
-			img: "/assets/profile/Annick Shinary.png",
-		},
-		{
-			username: "Bonze Athelstan",
-			img: "/assets/profile/Bonze Athelstan.png",
-		},
-		{
-			username: "Fy Hyung",
-			img: "/assets/profile/Fy Hyung.png",
-		},
-		{
-			username: "Manoa Razafi",
-			img: "/assets/profile/Manoa Razafi.png",
-		},
-		{
-			username: "Lutecianne-RM",
-			img: "/assets/profile/Lutecianne-RM.png",
-		},
-		{
-			username: "Jøsé",
-			img: "/assets/profile/Jøsé.png",
-		},
-		{
-			username: "Mac-Jacky",
-			img: "/assets/profile/Mac-Jacky.png",
-		},
-		{
-			username: "Rosah-La-Blanche",
-			img: "/assets/profile/Rosah-La-Blanche.png",
-		},
-		{
-			username: "SHIN YU",
-			img: "/assets/profile/SHIN YU.png",
-		},
-		{
-			username: "Stecy Ashley",
-			img: "/assets/profile/Stecy Ashley.png",
-		},
-		{
-			username: "Swae Todoroki",
-			img: "/assets/profile/Swae Todoroki.png",
-		},
-		{
-			username: "Tsiory Ralison",
-			img: "/assets/profile/Tsiory Ralison.png",
-		},
-	],
 };
 
 export default ChatList;

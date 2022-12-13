@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { GlobalContext } from "../../store/context/GlobalContext";
+import { AciveStatus } from "../common";
 
 const Chat = ({ chat }) => {
 	const { toogleSidebar } = GlobalContext();
@@ -9,16 +10,17 @@ const Chat = ({ chat }) => {
 		<div
 			className="flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10"
 			onClick={() => toogleSidebar()}>
-			<Image
-				src={chat.img}
-				alt={chat.username}
-				width={52}
-				height={52}
-				placeholder="blur"
-				blurDataURL={chat.img}
-				style={{ objectFit: "cover" }}
-				className="rounded-full border-2 border-greenBlue"
-			/>
+			<div className="relative">
+				<Image
+					src={chat.img}
+					alt={chat.username}
+					width={52}
+					height={52}
+					style={{ objectFit: "cover" }}
+					className="rounded-full border-2 border-greenBlue"
+				/>
+				<AciveStatus isActive={chat.active} />
+			</div>
 
 			<div>
 				<p className="text-base leading-none">{chat.username}</p>

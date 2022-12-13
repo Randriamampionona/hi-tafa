@@ -1,38 +1,49 @@
 import { useState } from "react";
 import { ProfileBar } from "../common";
 import FyHyung from "../../public/assets/profile/Fy Hyung.png";
-import MessageList from "./MessageList";
+import Chat from "./Chat";
 import ChatInput from "./ChatInput";
 import me from "../../public/assets/me.png";
 import fy from "../../public/assets/profile/Fy Hyung.png";
 import picture from "../../public/assets/picture.jpg";
 import UploadPopup from "./UploadPopup";
 import { GlobalContext } from "../../store/context/GlobalContext";
+import NoChat from "./NoChat";
 
 const ChatBox = ({ mockMessage }) => {
 	const { isSidebarOpen } = GlobalContext();
+	const [selectedChat, setSelectedChat] = useState(null);
 	const [message, setMessage] = useState(mockMessage);
 	const [openPopup, setOpenPopup] = useState(false);
 
 	return (
 		<section
-			className={`flex-grow flex-shrink grid grid-rows-asideGrid max-h-screen overflow-hidden text-darkBlue bg-[#e9ecee] sm:relative ${
+			className={`relative flex-grow flex-shrink grid grid-rows-asideGrid max-h-screen overflow-hidden text-darkBlue bg-[#e9ecee] sm:relative ${
 				!isSidebarOpen ? "" : ""
 			}`}>
-			{openPopup && (
-				<UploadPopup
-					setOpenPopup={setOpenPopup}
-					setMessage={setMessage}
-				/>
+			{selectedChat ? (
+				<>
+					{openPopup && (
+						<UploadPopup
+							setOpenPopup={setOpenPopup}
+							setMessage={setMessage}
+						/>
+					)}
+					<ProfileBar
+						email={"fyhyung@gami.com"}
+						username={"Fy Hyung"}
+						profileImg={FyHyung}
+						isChatBox
+					/>
+					<Chat mockMessage={message} />
+					<ChatInput
+						setMessage={setMessage}
+						setOpenPopup={setOpenPopup}
+					/>
+				</>
+			) : (
+				<NoChat />
 			)}
-			<ProfileBar
-				email={"fyhyung@gami.com"}
-				username={"Fy Hyung"}
-				profileImg={FyHyung}
-				isChatBox
-			/>
-			<MessageList mockMessage={message} />
-			<ChatInput setMessage={setMessage} setOpenPopup={setOpenPopup} />
 		</section>
 	);
 };

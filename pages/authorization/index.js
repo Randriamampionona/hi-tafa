@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import logo from "../../public/assets/logo.png";
-import { FiMail, FiLock } from "react-icons/fi";
-import { FaSignInAlt, FaUserCircle, FaUser, FaGithub } from "react-icons/fa";
+import { FiMail, FiLock, FiUser } from "react-icons/fi";
+import { FaSignInAlt, FaUserCircle, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { ImSpinner2 } from "react-icons/im";
 import { AuthContext } from "../../store/context/AuthContext";
+import { auth } from "../../lib/firebase.config";
 
 const initState = {
 	inputs: {
@@ -40,11 +41,13 @@ const AuthorizationPage = () => {
 				inputVal.password
 			);
 		}
+
+		setInputVal(initState.inputs);
 	};
 
 	return (
-		<main className="flex flex-col items-center justify-center gap-y-4 w-full h-screen">
-			<div className="group flex flex-col items-center justify-center max-w-[75%] w-full">
+		<main className="flex flex-col items-center justify-center gap-y-4 w-full h-screen bg-darkBlue">
+			<div className="group flex flex-col items-center justify-center">
 				<Image
 					src={logo}
 					alt="Hi-Tafa"
@@ -56,7 +59,7 @@ const AuthorizationPage = () => {
 				/>
 			</div>
 
-			<div className="flex flex-col items-center justify-center gap-y-3 max-w-sm w-full h-auto p-4 rounded shadow-lg shadow-darkBlue/10 border border-greenBlue/10">
+			<div className="flex flex-col items-center justify-center gap-y-3 max-w-sm w-full h-auto p-4 rounded bg-white shadow-lg shadow-darkBlue/10 border border-greenBlue/10">
 				<form
 					className="flex flex-col gap-y-2 w-full"
 					onSubmit={submitHandler}>
@@ -75,7 +78,7 @@ const AuthorizationPage = () => {
 							/>
 							<div className="flex items-center justify-between p-3 border border-darkBlue/20 rounded focus-within:border-greenBlue">
 								<span className="text-darkBlue/40">
-									<FaUser />
+									<FiUser />
 								</span>
 								<input
 									required
@@ -254,4 +257,19 @@ const SwitchForm = ({ hasAccount, setHasAccount }) => {
 			)}
 		</div>
 	);
+};
+
+export const getServerSideProps = () => {
+	// if (auth.currentUser) {
+	// 	return {
+	// 		redirect: {
+	// 			destination: "/",
+	// 			permanent: false,
+	// 		},
+	// 	};
+	// }
+
+	return {
+		props: {},
+	};
 };
