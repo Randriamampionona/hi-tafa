@@ -37,7 +37,6 @@ const ChatInput = ({
 			className="flex items-center h-12 bg-lightWhite focus-within:border focus-within:border-greenBlue"
 			onSubmit={sendHandler}>
 			<input
-				autoFocus
 				type="text"
 				placeholder="Write your message..."
 				className="flex-grow px-3 h-full bg-transparent border-0 outline-0"
