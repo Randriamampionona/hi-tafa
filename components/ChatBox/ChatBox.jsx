@@ -63,7 +63,7 @@ const ChatBox = () => {
 	useEffect(() => {
 		const getReceiverData = () => {
 			const docRef = collection(db, "chats", chatID, "messages");
-			const q = query(docRef, orderBy("date", "desc"));
+			const q = query(docRef, orderBy("date", "asc"));
 			const unsub = onSnapshot(q, (snapshot) => {
 				setChatData((prev) => ({
 					...prev,

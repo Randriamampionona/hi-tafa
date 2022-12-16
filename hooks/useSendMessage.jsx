@@ -16,10 +16,15 @@ const useSendMessage = () => {
 		try {
 			const collectionRef = collection(db, "chats", chatID, "messages");
 
-			if (chatID) {
+			if (chatID && data.msg.text !== "") {
 				await addDoc(collectionRef, data);
-				toastNotify("success", "Message sent");
+				return toastNotify("success", "Message sent");
 			}
+
+			return toastNotify(
+				"error",
+				"Something went wrong, try again later"
+			);
 		} catch (error) {
 			toastNotify("error", error.message);
 		} finally {

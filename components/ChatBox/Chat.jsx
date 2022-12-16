@@ -14,12 +14,12 @@ const Chat = ({ messages }) => {
 	return (
 		<div
 			id="section__chat-box"
-			className="flex-grow grid items-end gap-y-8 px-3 pt-3 pb-8"
+			className="flex-grow grid items-end gap-y-8 px-3 pt-3 pb-8 overflow-x-hidden"
 			style={{ overflowY: "overlay" }}>
 			{messages?.map((message) => (
 				<Message key={message.messageID} {...message} />
 			))}
-			<div ref={scrollReff} />
+			<div className="h-0 w-full" ref={scrollReff} />
 		</div>
 	);
 };
