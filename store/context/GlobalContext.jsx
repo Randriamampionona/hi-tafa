@@ -9,7 +9,7 @@ const initState = {
 		receiverID: null,
 	},
 	toogleSidebar: (key) => {},
-	setChatInfos: (chatID) => {},
+	setChatInfos: (chatInfos) => {},
 };
 
 const Context = createContext(initState);
@@ -24,10 +24,10 @@ export const GlobalProvider = ({ children }) => {
 		});
 	};
 
-	const setChatInfos = (chatID) => {
+	const setChatInfos = (chatInfos) => {
 		dispatch({
 			type: SET_CHAT_INFOS,
-			payload: chatID,
+			payload: chatInfos,
 		});
 	};
 

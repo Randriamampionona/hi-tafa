@@ -46,7 +46,7 @@ const defaultInfos = {
 const Context = createContext(initState);
 
 export const AuthProvider = ({ children }) => {
-	const { toogleSidebar } = GlobalContext();
+	const { toogleSidebar, setChatInfos } = GlobalContext();
 	const [currentUser, setCurrentUser] = useState(null);
 	const [authLoading, setAuthLoading] = useState(initState.authLoading);
 	const googleProvider = new GoogleAuthProvider();
@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }) => {
 				password
 			);
 
-			const docRef = doc(db, "users", currentUser.uid);
+			const docRef = doc(db, "users", result.user.uid);
 			await updateDoc(docRef, {
 				active: true,
 			});
@@ -148,6 +148,11 @@ export const AuthProvider = ({ children }) => {
 			});
 
 			await signOut(auth);
+
+			setChatInfos({
+				chatID: null,
+				receiverID: null,
+			});
 
 			toastNotify("success", "See you soon");
 			replace("/authorization");

@@ -9,7 +9,7 @@ const Chat = ({ messages }) => {
 			behavior: "smooth",
 			block: "end",
 		});
-	}, [messages]);
+	}, [messages?.length]);
 
 	return (
 		<div
