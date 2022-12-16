@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { AuthContext } from "../../store/context/AuthContext";
+import dateFormator from "./../../util/dateFormator";
 
 const messageModel = {
 	profileImg: "",
@@ -57,7 +58,7 @@ const Message = ({ profileImg, email, msg, date }) => {
 					)}
 				</div>
 				<span className="text-darkBlue/70 text-xs">
-					<i>{date}</i>
+					<i>{dateFormator?.(date)}</i>
 				</span>
 			</div>
 		</div>
