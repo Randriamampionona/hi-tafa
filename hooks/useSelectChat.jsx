@@ -1,4 +1,10 @@
-import { setDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
+import {
+	setDoc,
+	doc,
+	getDoc,
+	updateDoc,
+	serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../lib/firebase.config";
 import { AuthContext } from "../store/context/AuthContext";
 import { GlobalContext } from "../store/context/GlobalContext";
@@ -30,6 +36,7 @@ const useSelectChat = () => {
 					chatID: combinedID,
 					receiverID: userID,
 				});
+
 				return toastNotify("success", "Chat already exist");
 			}
 
@@ -49,7 +56,11 @@ const useSelectChat = () => {
 						username: rest.username,
 					},
 				],
-				lastMessage: "",
+				lastMessage: {
+					sender: "",
+					msg: "",
+					sentAt: serverTimestamp(),
+				},
 			};
 
 			await setDoc(docRef, data);

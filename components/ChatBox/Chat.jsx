@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
+import { GlobalContext } from "../../store/context/GlobalContext";
 import Message from "./Message";
 
 const Chat = ({ messages }) => {
+	const {
+		selectedChatInfos: { chatID },
+	} = GlobalContext();
 	const scrollReff = useRef();
 
 	useEffect(() => {
@@ -9,7 +13,7 @@ const Chat = ({ messages }) => {
 			behavior: "smooth",
 			block: "end",
 		});
-	}, [messages?.length]);
+	}, [messages?.length, chatID]);
 
 	return (
 		<div
