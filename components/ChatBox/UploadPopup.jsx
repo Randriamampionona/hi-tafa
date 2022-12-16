@@ -1,34 +1,59 @@
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { FaImages, FaTimes } from "react-icons/fa";
-import me from "../../public/assets/me.png";
+import useSendMessage from "../../hooks/useSendMessage";
+import { AuthContext } from "../../store/context/AuthContext";
 
-const UploadPopup = ({ setOpenPopup, setMessage }) => {
-	const [file, setFile] = useState(null);
+const UploadPopup = ({
+	resetInputMessage,
+	inputMessage,
+	setInputMessage,
+	setOpenPopup,
+}) => {
+	const { currentUser } = AuthContext();
+	const { sendMessageFunc, isSending } = useSendMessage();
 	const inputRef = useRef(null);
 
 	const getFileHandler = (data) => {
-		setFile(data?.name);
+		setInputMessage((prev) => ({
+			...prev,
+			profileImg: currentUser.photoURL,
+			email: currentUser.email,
+			msg: {
+				text: prev.msg.text,
+				media: data,
+			},
+			date: new Date().toString(),
+		}));
+	};
+
+	const changeHandler = (e) => {
+		setInputMessage((prev) => ({
+			...prev,
+			msg: {
+				...prev.msg,
+				text: e.target.value,
+			},
+		}));
+	};
+
+	const clearFileHandler = () => {
+		setInputMessage((prev) => ({
+			...prev,
+			msg: {
+				...prev.msg,
+				media: null,
+			},
+		}));
 	};
 
 	const closePopupHandler = () => {
-		setFile(null);
+		resetInputMessage();
 		setOpenPopup(false);
 	};
 
-	const uploadHandler = () => {
-		setMessage((prev) => [
-			...prev,
-			{
-				messageID: prev.at(-1)?.messageID + 1,
-				messageOwner: {
-					email: "toojrtn@gmail.com",
-					profileImg: me,
-				},
-				message: "Image uploaded",
-				date: `${new Date().getHours()}:${new Date().getMinutes()}`,
-			},
-		]);
+	const uploadHandler = async () => {
+		await sendMessageFunc(inputMessage);
 
 		closePopupHandler();
 	};
@@ -46,11 +71,11 @@ const UploadPopup = ({ setOpenPopup, setMessage }) => {
 
 				<div className="relative grid place-items-center w-full h-48 my-2 bg-darkWhite/20 rounded border border-darkWhite/50">
 					{/* file picker */}
-					{file ? (
+					{inputMessage.msg.media ? (
 						<div className="w-full h-full">
 							<Image
-								src={"/assets/" + file}
-								alt={file}
+								src={inputMessage.msg.media}
+								alt={inputMessage.msg.media}
 								fill={true}
 								style={{ objectFit: "contain" }}
 								className="rounded"
@@ -59,7 +84,7 @@ const UploadPopup = ({ setOpenPopup, setMessage }) => {
 					) : (
 						<div
 							className="flex flex-col items-center w-full h-full justify-center gap-y-3 cursor-pointer"
-							onClick={(e) => inputRef?.current.click()}>
+							onClick={() => inputRef?.current.click()}>
 							<span className="text-3xl text-lightWhite">
 								<FaImages />
 							</span>
@@ -70,12 +95,24 @@ const UploadPopup = ({ setOpenPopup, setMessage }) => {
 					)}
 
 					{/* remove image */}
-					{file && (
+					{inputMessage.msg.media && (
 						<span
 							className="z-10 absolute top-2 right-2 text-lightWhite p-1 rounded-full bg-darkWhite/10 hover:bg-darkWhite/20"
-							onClick={(e) => setFile(null)}>
+							onClick={clearFileHandler}>
 							<FaTimes />
 						</span>
+					)}
+
+					{/* message input */}
+					{inputMessage.msg.media && (
+						<input
+							autoFocus
+							type="text"
+							placeholder="message..."
+							className="z-10 absolute bottom-2 bg-lightWhite border-0 outline-0 rounded px-3 h-8 w-[80%] mx-auto focus-within:border-1 focus-within:border-greenBlue"
+							value={inputMessage.msg.text}
+							onChange={changeHandler}
+						/>
 					)}
 
 					{/* input */}
@@ -96,9 +133,10 @@ const UploadPopup = ({ setOpenPopup, setMessage }) => {
 					</button>
 
 					<button
+						disabled={isSending}
 						className="rounded text-lightWhite px-3 h-8 bg-greenBlue hover:bg-greenBlue/90"
 						onClick={uploadHandler}>
-						<span>Send</span>
+						<span>{isSending ? "Sending..." : "Send"}</span>
 					</button>
 				</div>
 			</div>

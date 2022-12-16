@@ -1,9 +1,18 @@
 import Image from "next/image";
+import { FaArrowLeft } from "react-icons/fa";
 import logo from "../../public/assets/logo.png";
+import { GlobalContext } from "../../store/context/GlobalContext";
 
 const NoChat = () => {
+	const { toogleSidebar } = GlobalContext();
+
 	return (
-		<div className="flex flex-col items-center justify-center w-full h-screen">
+		<div className="relative flex flex-col items-center justify-center w-full h-screen">
+			<span
+				className="absolute top-3 left-3 text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
+				onClick={toogleSidebar}>
+				<FaArrowLeft />
+			</span>
 			<Image
 				src={logo}
 				alt="hi-tafa"

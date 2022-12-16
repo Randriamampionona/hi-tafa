@@ -1,105 +1,133 @@
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ProfileBar } from "../common";
-import FyHyung from "../../public/assets/profile/Fy Hyung.png";
 import Chat from "./Chat";
 import ChatInput from "./ChatInput";
-import me from "../../public/assets/me.png";
-import fy from "../../public/assets/profile/Fy Hyung.png";
-import picture from "../../public/assets/picture.jpg";
 import UploadPopup from "./UploadPopup";
 import { GlobalContext } from "../../store/context/GlobalContext";
+import { AuthContext } from "../../store/context/AuthContext";
 import NoChat from "./NoChat";
+import {
+	collection,
+	doc,
+	onSnapshot,
+	orderBy,
+	query,
+	serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../../lib/firebase.config";
 
-const ChatBox = ({ mockMessage }) => {
-	const { isSidebarOpen } = GlobalContext();
-	const [selectedChat, setSelectedChat] = useState(null);
-	const [message, setMessage] = useState(mockMessage);
+const initChatState = {
+	receiverData: null,
+	messages: [],
+	message: {
+		profileImg: "",
+		email: "",
+		msg: {
+			text: "",
+			media: null,
+		},
+		date: serverTimestamp(),
+	},
+};
+
+const ChatBox = () => {
+	const {
+		isSidebarOpen,
+		selectedChatInfos: { chatID, receiverID },
+	} = GlobalContext();
+	const { currentUser } = AuthContext();
 	const [openPopup, setOpenPopup] = useState(false);
+	const [chatData, setChatData] = useState(initChatState);
+	const [inputMessage, setInputMessage] = useState(initChatState.message);
+
+	// listen for receiver data
+	useEffect(() => {
+		const getReceiverData = () => {
+			const docRef = doc(db, "users", receiverID);
+			const unsub = onSnapshot(docRef, (snapshot) => {
+				setChatData((prev) => ({
+					...prev,
+					receiverData: snapshot.data(),
+				}));
+			});
+
+			return () => {
+				unsub();
+			};
+		};
+
+		receiverID && getReceiverData();
+	}, [receiverID]);
+
+	// listen for chat (messages) data
+	useEffect(() => {
+		const getReceiverData = () => {
+			const docRef = collection(db, "chats", chatID, "messages");
+			const q = query(docRef, orderBy("date", "desc"));
+			const unsub = onSnapshot(q, (snapshot) => {
+				setChatData((prev) => ({
+					...prev,
+					messages: snapshot.docs.map((doc) => ({
+						messageID: doc.id,
+						...doc.data(),
+					})),
+				}));
+			});
+
+			return () => {
+				unsub();
+			};
+		};
+
+		chatID && getReceiverData();
+	}, [chatID]);
+
+	const resetInputMessage = () => {
+		setInputMessage({
+			profileImg: "",
+			email: "",
+			msg: {
+				text: "",
+				media: null,
+			},
+			date: new Date().toString(),
+		});
+	};
 
 	return (
 		<section
 			className={`relative flex-grow flex-shrink grid grid-rows-asideGrid max-h-screen overflow-hidden text-darkBlue bg-[#e9ecee] sm:relative ${
 				!isSidebarOpen ? "" : ""
 			}`}>
-			{selectedChat ? (
-				<>
+			{currentUser && chatID && receiverID && chatData.receiverData ? (
+				<Fragment>
 					{openPopup && (
 						<UploadPopup
+							resetInputMessage={resetInputMessage}
+							inputMessage={inputMessage}
+							setInputMessage={setInputMessage}
 							setOpenPopup={setOpenPopup}
-							setMessage={setMessage}
 						/>
 					)}
 					<ProfileBar
-						email={"fyhyung@gami.com"}
-						username={"Fy Hyung"}
-						profileImg={FyHyung}
+						email={chatData.receiverData?.email}
+						username={chatData.receiverData?.username}
+						profileImg={chatData.receiverData?.img}
 						isChatBox
 					/>
-					<Chat mockMessage={message} />
+					<Chat messages={chatData.messages} />
 					<ChatInput
-						setMessage={setMessage}
+						resetInputMessage={resetInputMessage}
+						inputMessage={inputMessage}
+						setInputMessage={setInputMessage}
 						setOpenPopup={setOpenPopup}
 					/>
-				</>
+				</Fragment>
 			) : (
 				<NoChat />
 			)}
 		</section>
 	);
-};
-
-ChatBox.defaultProps = {
-	mockMessage: [
-		{
-			messageID: 0,
-			messageOwner: {
-				email: "fyhyung@gami.com",
-				profileImg: fy,
-			},
-			message: "Hi!",
-			date: "17:00",
-		},
-		{
-			messageID: 1,
-			messageOwner: {
-				email: "toojrtn@gmail.com",
-				profileImg: me,
-			},
-			message:
-				"Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam temporibus, aliquam quos officia sed illum!",
-			date: "18:00",
-		},
-		{
-			messageID: 2,
-			messageOwner: {
-				email: "fyhyung@gami.com",
-				profileImg: fy,
-			},
-			message: "Lorem ipsum dolor sit amet consectetur adipisicing.",
-			date: "18:05",
-		},
-		{
-			messageID: 3,
-			messageOwner: {
-				email: "fyhyung@gami.com",
-				profileImg: fy,
-			},
-			message:
-				"Lorem ipsum, dolor sit amet consectetur adipisicing elit. Veniam, est debitis?",
-			date: "18:05",
-		},
-		{
-			messageID: 4,
-			messageOwner: {
-				email: "toojrtn@gmail.com",
-				profileImg: me,
-			},
-			message: {
-				picture,
-			},
-			date: "21:35",
-		},
-	],
 };
 
 export default ChatBox;

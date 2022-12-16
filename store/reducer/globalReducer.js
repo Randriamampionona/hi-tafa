@@ -1,4 +1,4 @@
-import { TOOGLE_SIDEBAR } from "../action/action";
+import { SET_CHAT_INFOS, TOOGLE_SIDEBAR } from "../action/action";
 
 const globalReducer = (state, action) => {
 	switch (action.type) {
@@ -8,6 +8,15 @@ const globalReducer = (state, action) => {
 				isSidebarOpen: action?.payload
 					? action?.payload
 					: !state.isSidebarOpen,
+			};
+
+		case SET_CHAT_INFOS:
+			return {
+				...state,
+				selectedChatInfos: {
+					chatID: action?.payload?.chatID,
+					receiverID: action?.payload?.receiverID,
+				},
 			};
 
 		default:

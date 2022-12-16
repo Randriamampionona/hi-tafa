@@ -1,26 +1,35 @@
-import { useState } from "react";
 import { FaImages, FaPaperPlane } from "react-icons/fa";
-import me from "../../public/assets/me.png";
+import { AuthContext } from "../../store/context/AuthContext";
+import useSendMessage from "./../../hooks/useSendMessage";
+import { ImSpinner2 } from "react-icons/im";
 
-const ChatInput = ({ setMessage, setOpenPopup }) => {
-	const [value, setValue] = useState("");
+const ChatInput = ({
+	resetInputMessage,
+	inputMessage,
+	setInputMessage,
+	setOpenPopup,
+}) => {
+	const { currentUser } = AuthContext();
+	const { sendMessageFunc, isSending } = useSendMessage();
 
-	const sendHandler = (e) => {
-		e.preventDefault();
-		setMessage((prev) => [
-			...prev,
-			{
-				messageID: prev.at(-1)?.messageID + 1,
-				messageOwner: {
-					email: "toojrtn@gmail.com",
-					profileImg: me,
-				},
-				message: value,
-				date: `${new Date().getHours()}:${new Date().getMinutes()}`,
+	const changeHandler = (e) => {
+		setInputMessage({
+			profileImg: currentUser?.photoURL,
+			email: currentUser?.email,
+			msg: {
+				text: e.target.value,
+				media: null,
 			},
-		]);
+			date: new Date().toString(),
+		});
+	};
 
-		setValue("");
+	const sendHandler = async (e) => {
+		e.preventDefault();
+
+		await sendMessageFunc(inputMessage);
+
+		resetInputMessage();
 	};
 
 	return (
@@ -32,8 +41,8 @@ const ChatInput = ({ setMessage, setOpenPopup }) => {
 				type="text"
 				placeholder="Write your message..."
 				className="flex-grow px-3 h-full bg-transparent border-0 outline-0"
-				value={value}
-				onChange={(e) => setValue(e.target.value)}
+				value={inputMessage.msg.text}
+				onChange={changeHandler}
 			/>
 			<div className="flex items-center h-full">
 				<button
@@ -48,10 +57,18 @@ const ChatInput = ({ setMessage, setOpenPopup }) => {
 					</span>
 				</button>
 
-				<button className="grid place-items-center h-full w-12 bg-greenBlue hover:bg-greenBlue/90">
-					<span className="text-lightWhite text-lg">
-						<FaPaperPlane />
-					</span>
+				<button
+					disabled={isSending}
+					className="grid place-items-center h-full w-12 bg-greenBlue hover:bg-greenBlue/90 disabled:cursor-progress">
+					{isSending ? (
+						<span className="animate-spin">
+							<ImSpinner2 />
+						</span>
+					) : (
+						<span className="text-lightWhite text-lg">
+							<FaPaperPlane />
+						</span>
+					)}
 				</button>
 			</div>
 		</form>

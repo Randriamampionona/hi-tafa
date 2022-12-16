@@ -1,1 +1,2 @@
 export const TOOGLE_SIDEBAR = "TOOGLE_SIDEBAR";
+export const SET_CHAT_INFOS = "SET_CHAT_INFOS";

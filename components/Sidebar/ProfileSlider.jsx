@@ -9,9 +9,9 @@ const ProfileSlider = ({ chatList }) => {
 	const { toogleSidebar } = GlobalContext();
 	const { selectChatFun } = useSelectChat();
 
-	const selectChatHandler = async (userID, email) => {
+	const selectChatHandler = async (selectedUser) => {
 		toogleSidebar();
-		await selectChatFun(userID, email);
+		await selectChatFun(selectedUser);
 	};
 
 	return (
@@ -21,9 +21,7 @@ const ProfileSlider = ({ chatList }) => {
 					<SwiperSlide key={profile.userID}>
 						<div
 							className="flex-grow flex flex-col items-center justify-start gap-y-1 w-14"
-							onClick={() =>
-								selectChatHandler(profile.userID, profile.email)
-							}>
+							onClick={() => selectChatHandler(profile)}>
 							<div className="relative">
 								<Image
 									src={profile.img}
