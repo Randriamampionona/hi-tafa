@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "../../lib/firebase.config";
 import toastNotify from "./../../util/toast";
+import nookies from "nookies";
 import {
 	createUserWithEmailAndPassword,
 	updateProfile,
@@ -53,6 +54,18 @@ export const AuthProvider = ({ children }) => {
 	const githubProvider = new GithubAuthProvider();
 	const { replace } = useRouter();
 
+	const cookieHandler = {
+		add: (token) => {
+			nookies.set(null, "user_token", token, {
+				path: "/",
+				maxAge: 60 * 60 * 60 * 24,
+			});
+		},
+		delete: () => {
+			nookies.destroy(null, "user_token");
+		},
+	};
+
 	// listen for user state
 	useEffect(
 		() =>
@@ -93,6 +106,10 @@ export const AuthProvider = ({ children }) => {
 
 			await setDoc(docRef, data);
 
+			const token = await result.user.getIdToken({ forceRefresh: true });
+
+			cookieHandler.add(token);
+
 			toastNotify("success", "User created successfully");
 			replace("/");
 		} catch (error) {
@@ -122,6 +139,10 @@ export const AuthProvider = ({ children }) => {
 			await updateDoc(docRef, {
 				active: true,
 			});
+
+			const token = await result.user.getIdToken({ forceRefresh: true });
+
+			cookieHandler.add(token);
 
 			toastNotify("success", `So long ${result.user?.displayName}`);
 			replace("/");
@@ -153,6 +174,8 @@ export const AuthProvider = ({ children }) => {
 				chatID: null,
 				receiverID: null,
 			});
+
+			cookieHandler.delete();
 
 			toastNotify("success", "See you soon");
 			replace("/authorization");
@@ -190,6 +213,10 @@ export const AuthProvider = ({ children }) => {
 			};
 
 			await setDoc(docRef, data);
+
+			const token = await result.user.getIdToken({ forceRefresh: true });
+
+			cookieHandler.add(token);
 
 			toastNotify("success", `So long ${result.user?.displayName}`);
 			replace("/");

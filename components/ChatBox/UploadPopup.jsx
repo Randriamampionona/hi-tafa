@@ -53,7 +53,8 @@ const UploadPopup = ({
 	};
 
 	const uploadHandler = async () => {
-		await sendMessageFunc(inputMessage);
+		// await sendMessageFunc(inputMessage);
+		alert("No implemented yet, We are working on it!");
 
 		closePopupHandler();
 	};

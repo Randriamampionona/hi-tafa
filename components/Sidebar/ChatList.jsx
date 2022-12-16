@@ -11,19 +11,20 @@ const ChatList = () => {
 	const [chatList, setChatList] = useState([]);
 
 	const docRef = collection(db, "users");
-	const q = query(
-		docRef,
-		where("userID", "!=", currentUser?.uid || "")
-	);
-	
-	useEffect(() => onSnapshot(q, (snapshot) => {
+	const q = query(docRef, where("userID", "!=", currentUser?.uid || ""));
+
+	useEffect(
+		() =>
+			onSnapshot(q, (snapshot) => {
 				setChatList(
 					snapshot.docs.map((doc) => ({
 						chatID: doc.id,
 						...doc.data(),
 					}))
 				);
-			}), [currentUser]);
+			}),
+		[currentUser]
+	);
 
 	return (
 		<div

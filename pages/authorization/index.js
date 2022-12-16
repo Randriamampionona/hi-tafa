@@ -6,7 +6,8 @@ import { FaSignInAlt, FaUserCircle, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { ImSpinner2 } from "react-icons/im";
 import { AuthContext } from "../../store/context/AuthContext";
-import { auth } from "../../lib/firebase.config";
+import nookies from "nookies";
+import admin from "./../../lib/firebaseAdmin.config";
 
 const initState = {
 	inputs: {
@@ -259,17 +260,29 @@ const SwitchForm = ({ hasAccount, setHasAccount }) => {
 	);
 };
 
-export const getServerSideProps = () => {
-	// if (auth.currentUser) {
-	// 	return {
-	// 		redirect: {
-	// 			destination: "/",
-	// 			permanent: false,
-	// 		},
-	// 	};
-	// }
+export const getServerSideProps = async (ctx) => {
+	try {
+		const cookies = nookies.get(ctx);
+		const token = await admin.auth().verifyIdToken(cookies.user_token);
 
-	return {
-		props: {},
-	};
+		console.log(token);
+
+		if (token) {
+			// either the `token` cookie didn't exist
+			// or token verification failed
+			// either way: redirect to the login page
+			ctx.res.writeHead(302, { Location: "/" });
+			ctx.res.end();
+
+			// `as never` prevents inference issues
+			// with InferGetServerSidePropsType.
+			// The props returned here don't matter because we've
+			// already redirected the user.
+			return { props: {} };
+		}
+	} catch (error) {
+		return {
+			props: {},
+		};
+	}
 };
