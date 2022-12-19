@@ -2,8 +2,8 @@ import {
 	addDoc,
 	collection,
 	doc,
-	updateDoc,
 	serverTimestamp,
+	updateDoc,
 } from "firebase/firestore";
 import { useState } from "react";
 import { db } from "../lib/firebase.config";
@@ -23,17 +23,23 @@ const useSendMessage = () => {
 
 		try {
 			const collectionRef = collection(db, "chats", chatID, "messages");
-			const docRef = doc(db, "chats", chatID);
+			const lastMsgRef = doc(db, "chats", chatID);
 
 			if (chatID && data.msg.text !== "") {
 				// sending message
 				await addDoc(collectionRef, data);
 
-				// updating last message
-				await updateDoc(docRef, {
-					["lastMessage.sender"]: currentUser.email,
-					["lastMessage.msg"]: data.msg.text,
-					["lastMessage.sentAt"]: serverTimestamp(),
+				// updating last message (isSeen, sender, message)
+				await updateDoc(lastMsgRef, {
+					lastMessage: {
+						sender: {
+							id: currentUser?.uid,
+							email: currentUser?.email,
+						},
+						message: data.msg.media ? "Photo" : data.msg.text,
+						isSeen: false,
+						when: serverTimestamp(),
+					},
 				});
 
 				return toastNotify("success", "Message sent");

@@ -268,16 +268,9 @@ export const getServerSideProps = async (ctx) => {
 		console.log(token);
 
 		if (token) {
-			// either the `token` cookie didn't exist
-			// or token verification failed
-			// either way: redirect to the login page
-			ctx.res.writeHead(302, { Location: "/" });
+			ctx.res.writeHead(308, { Location: "/" });
 			ctx.res.end();
 
-			// `as never` prevents inference issues
-			// with InferGetServerSidePropsType.
-			// The props returned here don't matter because we've
-			// already redirected the user.
 			return { props: {} };
 		}
 	} catch (error) {

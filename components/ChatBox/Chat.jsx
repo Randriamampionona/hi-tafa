@@ -9,10 +9,14 @@ const Chat = ({ messages }) => {
 	const scrollReff = useRef();
 
 	useEffect(() => {
-		scrollReff?.current?.scrollIntoView({
-			behavior: "smooth",
-			block: "end",
-		});
+		const timiID = setTimeout(() => {
+			scrollReff?.current?.scrollIntoView({
+				behavior: "smooth",
+				block: "end",
+			});
+		}, 100);
+
+		return () => timiID
 	}, [messages?.length, chatID]);
 
 	return (

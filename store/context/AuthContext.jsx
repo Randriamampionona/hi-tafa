@@ -23,6 +23,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { GlobalContext } from "./GlobalContext";
+import useAddUser from "../../hooks/useAddUser";
 
 const initState = {
 	currentUser: null,
@@ -48,6 +49,7 @@ const Context = createContext(initState);
 
 export const AuthProvider = ({ children }) => {
 	const { toogleSidebar, setChatInfos } = GlobalContext();
+	const { addUserFunc } = useAddUser();
 	const [currentUser, setCurrentUser] = useState(null);
 	const [authLoading, setAuthLoading] = useState(initState.authLoading);
 	const googleProvider = new GoogleAuthProvider();
@@ -94,17 +96,8 @@ export const AuthProvider = ({ children }) => {
 				photoURL: defaultInfos.photoURL,
 			});
 
-			const docRef = doc(db, "users", result?.user?.uid);
-
-			const data = {
-				userID: result?.user?.uid,
-				username: result?.user?.displayName,
-				email: result?.user?.email,
-				img: defaultInfos.photoURL,
-				active: true,
-			};
-
-			await setDoc(docRef, data);
+			// add user handler
+			await addUserFunc(result);
 
 			const token = await result.user.getIdToken({ forceRefresh: true });
 
@@ -202,17 +195,8 @@ export const AuthProvider = ({ children }) => {
 				provider === "google" ? googleProvider : githubProvider
 			);
 
-			const docRef = doc(db, "users", result?.user?.uid);
-
-			const data = {
-				userID: result?.user?.uid,
-				username: result?.user?.displayName,
-				email: result?.user?.email,
-				img: result?.user?.photoURL,
-				active: true,
-			};
-
-			await setDoc(docRef, data);
+			// add user handler
+			await addUserFunc(result);
 
 			const token = await result.user.getIdToken({ forceRefresh: true });
 

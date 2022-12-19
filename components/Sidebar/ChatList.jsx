@@ -1,30 +1,73 @@
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+/* eslint-disable react-hooks/exhaustive-deps */
+import {
+	collection,
+	onSnapshot,
+	orderBy,
+	query,
+	where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db } from "../../lib/firebase.config";
 import { AuthContext } from "../../store/context/AuthContext";
+import getOtherUser from "../../util/getOtherUser";
 import Chat from "./Chat";
 import ProfileSlider from "./ProfileSlider";
 import Search from "./Search";
 
 const ChatList = () => {
 	const { currentUser } = AuthContext();
-	const [chatList, setChatList] = useState([]);
+	const [usersList, setUsersList] = useState([]);
+	const [chatsList, setChatsList] = useState([]);
 
-	const docRef = collection(db, "users");
-	const q = query(docRef, where("userID", "!=", currentUser?.uid || ""));
+	// listen for users data
+	useEffect(() => {
+		const getUsers = () => {
+			const docRef = collection(db, "users");
+			const q = query(docRef, where("userID", "!=", currentUser.uid));
 
-	useEffect(
-		() =>
-			onSnapshot(q, (snapshot) => {
-				setChatList(
+			const unsub = onSnapshot(q, (snapshot) => {
+				setUsersList(
 					snapshot.docs.map((doc) => ({
-						chatID: doc.id,
 						...doc.data(),
 					}))
 				);
-			}),
-		[currentUser]
-	);
+			});
+
+			return () => {
+				unsub();
+			};
+		};
+
+		currentUser && getUsers();
+	}, [currentUser]);
+
+	// listen for chats data
+	useEffect(() => {
+		const getChats = () => {
+			const collectionRef = collection(db, "chats");
+			const q = query(collectionRef, orderBy("createdAt", "desc"));
+
+			const unsub = onSnapshot(q, (snapshot) => {
+				const chatsArrays = snapshot.docs.map((doc) => ({
+					...doc.data(),
+				}));
+				const filteredChats = chatsArrays?.filter((chat) => {
+					if (
+						!!chat.owners.find((o) => o.userID === currentUser?.uid)
+					) {
+						return chat;
+					}
+				});
+				setChatsList(filteredChats);
+			});
+
+			return () => {
+				unsub();
+			};
+		};
+
+		currentUser && usersList.length && getChats();
+	}, [currentUser, usersList]);
 
 	return (
 		<div
@@ -32,12 +75,18 @@ const ChatList = () => {
 			className="space-y-3"
 			style={{ overflowY: "overlay" }}>
 			<Search />
-			<ProfileSlider chatList={chatList} />
+			<ProfileSlider usersList={usersList} />
 
 			<div>
-				{chatList.map((chat) => (
-					<Chat key={chat.chatID} chat={chat} />
-				))}
+				{chatsList.length ? (
+					chatsList.map((chat) => (
+						<Chat key={chat.chatID} chat={chat} />
+					))
+				) : (
+					<span className="w-full text-center text-sm text-darkWhite px-3 mt-6">
+						No chat yet, start a new one
+					</span>
+				)}
 			</div>
 		</div>
 	);

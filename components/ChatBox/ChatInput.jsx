@@ -27,7 +27,7 @@ const ChatInput = ({
 	const sendHandler = async (e) => {
 		e.preventDefault();
 
-		await sendMessageFunc(inputMessage);
+		inputMessage.msg.text?.trim() && (await sendMessageFunc(inputMessage));
 
 		resetInputMessage();
 	};

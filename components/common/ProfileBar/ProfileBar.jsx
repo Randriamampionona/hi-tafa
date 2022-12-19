@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useRouter } from "next/router";
 import {
 	FaCamera,
 	FaEdit,
@@ -8,7 +9,9 @@ import {
 	FaArrowLeft,
 } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
+import { AuthContext } from "../../../store/context/AuthContext";
 import { GlobalContext } from "../../../store/context/GlobalContext";
+import AciveStatus from "../AciveStatus/AciveStatus";
 
 const defaultInfos = {
 	displayName: "unknown",
@@ -16,8 +19,10 @@ const defaultInfos = {
 		"https://w7.pngwing.com/pngs/754/2/png-transparent-samsung-galaxy-a8-a8-user-login-telephone-avatar-pawn-blue-angle-sphere-thumbnail.png",
 };
 
-const ProfileBar = ({ profileImg, username, email, isChatBox }) => {
+const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 	const { toogleSidebar } = GlobalContext();
+	const { currentUser } = AuthContext();
+	const { push } = useRouter();
 
 	return (
 		<div
@@ -32,16 +37,17 @@ const ProfileBar = ({ profileImg, username, email, isChatBox }) => {
 						<FaArrowLeft />
 					</span>
 				)}
-				<Image
-					src={profileImg || defaultInfos.photoURL}
-					alt={username || defaultInfos.displayName}
-					width={52}
-					height={52}
-					// placeholder="blur"
-					// blurDataURL={profileImg}
-					style={{ objectFit: "cover" }}
-					className="rounded-full border-2 border-greenBlue"
-				/>
+				<div className="relative">
+					<Image
+						src={profileImg || defaultInfos.photoURL}
+						alt={username || defaultInfos.displayName}
+						width={52}
+						height={52}
+						style={{ objectFit: "cover" }}
+						className="rounded-full border-2 border-greenBlue"
+					/>
+					{isChatBox && <AciveStatus isActive={active} />}
+				</div>
 
 				<div>
 					<p className="font-bold text-lg leading-none">
@@ -74,7 +80,9 @@ const ProfileBar = ({ profileImg, username, email, isChatBox }) => {
 					<span className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20">
 						<FaCamera />
 					</span>
-					<span className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20">
+					<span
+						className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20"
+						onClick={() => push(`/profile/${currentUser.uid}`)}>
 						<FaEdit />
 					</span>
 				</div>

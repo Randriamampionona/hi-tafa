@@ -26,15 +26,30 @@
 	width: 0.5rem;
 }
 
+body::-webkit-scrollbar {
+	display: block;
+	width: 0.5rem;
+}
+
 #section__chat-box::-webkit-scrollbar-thumb,
 #sidebar__chat-list::-webkit-scrollbar-thumb {
 	background: #29ad7d7a;
 	border-radius: 5px;
 }
 
+body::-webkit-scrollbar-thumb {
+	background: #1e314465;
+	border-radius: 5px;
+}
+
 #section__chat-box::-webkit-scrollbar-thumb:hover,
 #sidebar__chat-list::-webkit-scrollbar-thumb:hover {
 	background: #29ad7d;
+	border-radius: 5px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+	background: #1e3144;
 	border-radius: 5px;
 }
 

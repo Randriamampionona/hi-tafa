@@ -9,6 +9,7 @@ import { db } from "../lib/firebase.config";
 import { AuthContext } from "../store/context/AuthContext";
 import { GlobalContext } from "../store/context/GlobalContext";
 import toastNotify from "../util/toast";
+import getOtherUser from "./../util/getOtherUser";
 
 const useSelectChat = () => {
 	const { setChatInfos } = GlobalContext();
@@ -20,27 +21,39 @@ const useSelectChat = () => {
 				return toastNotify("error", "can't talk to yourself");
 			}
 
-			// check if chat already exist if not create
+			// generate doc ID
 			const combinedID =
 				currentUser.uid > userID
 					? `${currentUser.uid}-and-${userID}`
 					: `${userID}-and-${currentUser.uid}`;
 
-			const docRef = doc(db, "chats", combinedID);
+			// doc refs
+			const chatRef = doc(db, "chats", combinedID);
 
-			const chat = await getDoc(docRef);
+			const chats = await getDoc(chatRef);
 
-			if (chat.exists()) {
+			// return if chat already exist and set chat infos
+			if (chats.exists()) {
 				// set chat here
 				setChatInfos({
-					chatID: combinedID,
-					receiverID: userID,
+					chatID: chats.data()?.chatID,
+					receiverID: getOtherUser?.(
+						chats.data()?.owners,
+						currentUser
+					)?.userID,
+				});
+
+				// update last message (isSeen)
+				await updateDoc(chatRef, {
+					["lastMessage.isSeen"]: true,
 				});
 
 				return toastNotify("success", "Chat already exist");
 			}
 
-			const data = {
+			// create chat if never exist
+			const chatData = {
+				chatID: combinedID,
 				createdAt: serverTimestamp(),
 				owners: [
 					{
@@ -57,14 +70,19 @@ const useSelectChat = () => {
 					},
 				],
 				lastMessage: {
-					sender: "",
-					msg: "",
-					sentAt: serverTimestamp(),
+					sender: {
+						id: "",
+						email: "",
+					},
+					message: "",
+					isSeen: true,
+					when: serverTimestamp(),
 				},
 			};
 
-			await setDoc(docRef, data);
+			await setDoc(chatRef, chatData);
 
+			// set chat infos after all
 			setChatInfos({
 				chatID: combinedID,
 				receiverID: userID,

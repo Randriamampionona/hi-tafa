@@ -113,6 +113,7 @@ const ChatBox = () => {
 						email={chatData.receiverData?.email}
 						username={chatData.receiverData?.username}
 						profileImg={chatData.receiverData?.img}
+						active={chatData.receiverData?.active}
 						isChatBox
 					/>
 					<Chat messages={chatData.messages} />

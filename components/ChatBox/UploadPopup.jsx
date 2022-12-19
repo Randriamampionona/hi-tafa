@@ -1,7 +1,8 @@
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FaImages, FaTimes } from "react-icons/fa";
 import useSendMessage from "../../hooks/useSendMessage";
+import useUploadFile from "../../hooks/useUploadFile";
 import { AuthContext } from "../../store/context/AuthContext";
 
 const UploadPopup = ({
@@ -11,17 +12,24 @@ const UploadPopup = ({
 	setOpenPopup,
 }) => {
 	const { currentUser } = AuthContext();
+	const { isUploading, uploadFileFun, removeFileFunc, isDeleting } =
+		useUploadFile();
 	const { sendMessageFunc, isSending } = useSendMessage();
+	const [filePath, setFilePath] = useState("");
 	const inputRef = useRef(null);
 
-	const getFileHandler = (data) => {
+	const chooseFileHandler = async (file) => {
+		const downloadURL = await uploadFileFun(file);
+
+		setFilePath(downloadURL?.path);
+
 		setInputMessage((prev) => ({
 			...prev,
 			profileImg: currentUser.photoURL,
 			email: currentUser.email,
 			msg: {
 				text: prev.msg.text,
-				media: data,
+				media: downloadURL?.url,
 			},
 			date: new Date().toString(),
 		}));
@@ -37,24 +45,29 @@ const UploadPopup = ({
 		}));
 	};
 
-	const clearFileHandler = () => {
-		setInputMessage((prev) => ({
-			...prev,
-			msg: {
-				...prev.msg,
-				media: null,
-			},
-		}));
+	const clearFileHandler = async () => {
+		if (inputMessage.msg.media) {
+			await removeFileFunc(filePath);
+
+			setInputMessage((prev) => ({
+				...prev,
+				msg: {
+					text: "",
+					media: null,
+				},
+			}));
+		}
 	};
 
 	const closePopupHandler = () => {
-		resetInputMessage();
-		setOpenPopup(false);
+		if (!isUploading && !isSending && !isDeleting) {
+			resetInputMessage();
+			setOpenPopup(false);
+		}
 	};
 
-	const uploadHandler = async () => {
-		// await sendMessageFunc(inputMessage);
-		alert("No implemented yet, We are working on it!");
+	const sendHandler = async () => {
+		await sendMessageFunc(inputMessage);
 
 		closePopupHandler();
 	};
@@ -121,22 +134,23 @@ const UploadPopup = ({
 						type="file"
 						className="hidden"
 						ref={inputRef}
-						onChange={(e) => getFileHandler(e.target.files[0])}
+						onChange={(e) => chooseFileHandler(e.target.files[0])}
 						accept={".png, .jpeg, .jpg, .gif, .tif"}
 					/>
 				</div>
 
 				<div className="flex items-center justify-end gap-x-2 w-full">
 					<button
-						className="rounded text-lightWhite px-3 h-8 hover:bg-darkWhite/20"
+						disabled={isSending || isUploading || isDeleting}
+						className="rounded text-lightWhite px-3 h-8 hover:bg-darkWhite/20 disabled:bg-darkWhite/20 disabled:cursor-progress"
 						onClick={closePopupHandler}>
 						<span>Cancel</span>
 					</button>
 
 					<button
-						disabled={isSending}
-						className="rounded text-lightWhite px-3 h-8 bg-greenBlue hover:bg-greenBlue/90"
-						onClick={uploadHandler}>
+						disabled={isSending || isUploading || isDeleting}
+						className="rounded text-lightWhite px-3 h-8 bg-greenBlue hover:bg-greenBlue/90 disabled:bg-greenBlue/90 disabled:cursor-progress"
+						onClick={sendHandler}>
 						<span>{isSending ? "Sending..." : "Send"}</span>
 					</button>
 				</div>
