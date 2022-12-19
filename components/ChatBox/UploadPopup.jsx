@@ -4,6 +4,8 @@ import { FaImages, FaTimes } from "react-icons/fa";
 import useSendMessage from "../../hooks/useSendMessage";
 import useUploadFile from "../../hooks/useUploadFile";
 import { AuthContext } from "../../store/context/AuthContext";
+import { GlobalContext } from "../../store/context/GlobalContext";
+import uuidGenerator from "../../util/uuidGenerator";
 
 const UploadPopup = ({
 	resetInputMessage,
@@ -11,6 +13,9 @@ const UploadPopup = ({
 	setInputMessage,
 	setOpenPopup,
 }) => {
+	const {
+		selectedChatInfos: { chatID },
+	} = GlobalContext();
 	const { currentUser } = AuthContext();
 	const { isUploading, uploadFileFun, removeFileFunc, isDeleting } =
 		useUploadFile();
@@ -19,7 +24,8 @@ const UploadPopup = ({
 	const inputRef = useRef(null);
 
 	const chooseFileHandler = async (file) => {
-		const downloadURL = await uploadFileFun(file);
+		const path = `chat/${chatID}/${uuidGenerator?.()} - ${file?.name}`;
+		const downloadURL = await uploadFileFun(file, path);
 
 		setFilePath(downloadURL?.path);
 

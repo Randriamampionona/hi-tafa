@@ -112,7 +112,7 @@ const ChatBox = () => {
 					<ProfileBar
 						email={chatData.receiverData?.email}
 						username={chatData.receiverData?.username}
-						profileImg={chatData.receiverData?.img}
+						profileImg={chatData.receiverData?.img.profilePicture}
 						active={chatData.receiverData?.active}
 						isChatBox
 					/>

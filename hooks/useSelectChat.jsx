@@ -65,7 +65,7 @@ const useSelectChat = () => {
 					{
 						userID,
 						email,
-						img: rest.img,
+						img: rest.img.profilePicture,
 						username: rest.username,
 					},
 				],

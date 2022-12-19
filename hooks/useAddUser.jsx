@@ -28,7 +28,10 @@ const useAddUser = () => {
 				userID: result?.user?.uid,
 				username: result?.user?.displayName,
 				email: result?.user?.email,
-				img: result?.user?.photoURL,
+				img: {
+					profilePicture: result?.user?.photoURL,
+					coverPhoto: result?.user?.photoURL,
+				},
 				active: true,
 				isBanned: false,
 				joinedOn: serverTimestamp(),

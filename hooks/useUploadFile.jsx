@@ -17,24 +17,21 @@ const useUploadFile = () => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const uploadFileFun = async (file) => {
+	const uploadFileFun = async (file, path) => {
 		setIsUploading(true);
 
 		try {
 			if (file) {
-				const path = `medias/${chatID}/${uuidGenerator?.()} - ${
-					file?.name
-				}`;
 				const storageRef = ref(storage, path);
 				await uploadBytes(storageRef, file);
 
 				const downloadURL = await getDownloadURL(storageRef);
 
-				console.log(downloadURL);
+				toastNotify("success", "File uploaded");
 
 				return {
 					url: downloadURL,
-					path: path,
+					path,
 				};
 			}
 
@@ -52,6 +49,7 @@ const useUploadFile = () => {
 		try {
 			const storageRef = ref(storage, path);
 			await deleteObject(storageRef);
+			return toastNotify("success", "File deleted");
 		} catch (error) {
 			return toastNotify("error", error.message);
 		} finally {

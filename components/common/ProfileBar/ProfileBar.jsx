@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import {
 	FaCamera,
 	FaEdit,
@@ -9,9 +10,11 @@ import {
 	FaArrowLeft,
 } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
+import useUpdateProfile from "../../../hooks/useUpdateProfile";
 import { AuthContext } from "../../../store/context/AuthContext";
 import { GlobalContext } from "../../../store/context/GlobalContext";
 import AciveStatus from "../AciveStatus/AciveStatus";
+import LoadingImg from "../Loading/LoadingImg";
 
 const defaultInfos = {
 	displayName: "unknown",
@@ -22,7 +25,13 @@ const defaultInfos = {
 const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 	const { toogleSidebar } = GlobalContext();
 	const { currentUser } = AuthContext();
+	const { updateImgFun } = useUpdateProfile();
 	const { push } = useRouter();
+	const inpRef = useRef(null);
+
+	const pickFileHandler = async (imgType, file) => {
+		await updateImgFun(imgType, file);
+	};
 
 	return (
 		<div
@@ -46,7 +55,8 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 						style={{ objectFit: "cover" }}
 						className="rounded-full border-2 border-greenBlue"
 					/>
-					{isChatBox && <AciveStatus isActive={active} />}
+					{!isChatBox && <LoadingImg imgType={"profilePicture"} />}
+					{isChatBox && <AciveStatus isActive={active} onChatBox />}
 				</div>
 
 				<div>
@@ -77,7 +87,9 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 				</div>
 			) : (
 				<div className="flex items-center gap-x-3">
-					<span className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20">
+					<span
+						className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20"
+						onClick={() => inpRef?.current.click()}>
 						<FaCamera />
 					</span>
 					<span
@@ -85,6 +97,15 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 						onClick={() => push(`/profile/${currentUser.uid}`)}>
 						<FaEdit />
 					</span>
+					<input
+						hidden
+						type="file"
+						ref={inpRef}
+						className="hidden"
+						onChange={(e) =>
+							pickFileHandler("profilePicture", e.target.files[0])
+						}
+					/>
 				</div>
 			)}
 		</div>

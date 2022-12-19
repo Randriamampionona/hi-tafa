@@ -24,7 +24,7 @@ const ProfileSlider = ({ usersList }) => {
 							onClick={() => selectChatHandler(user)}>
 							<div className="relative">
 								<Image
-									src={user.img}
+									src={user.img.profilePicture}
 									alt={user.username}
 									width={52}
 									height={52}
