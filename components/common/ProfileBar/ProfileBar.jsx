@@ -100,6 +100,7 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 					<input
 						hidden
 						type="file"
+						accept=".jpg, .jpeg, .png"
 						ref={inpRef}
 						className="hidden"
 						onChange={(e) =>
