@@ -1,6 +1,7 @@
 import Image from "next/legacy/image";
+import { useRouter } from "next/router";
 import { useRef } from "react";
-import { FaCamera, FaRegEdit } from "react-icons/fa";
+import { FaArrowLeft, FaCamera, FaRegEdit } from "react-icons/fa";
 import useUpdateProfile from "../../hooks/useUpdateProfile";
 import { LoadingImg } from "../common";
 
@@ -8,6 +9,7 @@ const ProfileBlock = ({ userProfileInfos }) => {
 	const { updateImgFun } = useUpdateProfile();
 	const coverPhotoRef = useRef(null);
 	const profilePictureRef = useRef(null);
+	const { push } = useRouter();
 
 	const pickFileHandler = async (imgType, file) => {
 		await updateImgFun(imgType, file);
@@ -36,18 +38,25 @@ const ProfileBlock = ({ userProfileInfos }) => {
 					hidden
 					type="file"
 					className="hidden"
+					accept=".jpg, .jpeg, .png"
 					ref={coverPhotoRef}
 					onChange={(e) =>
 						pickFileHandler("coverPhoto", e.target.files[0])
 					}
 				/>
+				{/* back btn */}
+				<span
+					className="absolute top-4 left-4 text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
+					onClick={() => push("/")}>
+					<FaArrowLeft />
+				</span>
 			</div>
 
 			{/* profile */}
 			<div className="z-20 absolute left-0 bottom-[-16.5rem] flex flex-col items-center justify-center w-full px-4 md:flex-row md:items-end md:justify-between md:bottom-[-7rem]">
 				{/* profile */}
 				<div className="order-1 flex flex-col items-center justify-center space-y-4 space-x-0 md:flex-row md:items-end md:justify-start md:space-y-0 md:space-x-4">
-					<figure className="relative w-36 h-36 rounded-full border-4 border-greenBlue bg-darkWhite/10">
+					<figure className="relative w-36 h-36 rounded-full border-4 border-greenBlue">
 						<Image
 							src={userProfileInfos?.img.profilePicture}
 							alt={userProfileInfos?.username}
@@ -55,7 +64,7 @@ const ProfileBlock = ({ userProfileInfos }) => {
 							objectFit="cover"
 							width={144}
 							height={144}
-							className="!rounded-full hover:brightness-90"
+							className="!rounded-full hover:brightness-90 bg-darkWhite/10"
 						/>
 						<LoadingImg imgType={"profilePicture"} />
 						<button
@@ -68,6 +77,7 @@ const ProfileBlock = ({ userProfileInfos }) => {
 						<input
 							hidden
 							type="file"
+							accept=".jpg, .jpeg, .png"
 							className="hidden"
 							ref={profilePictureRef}
 							onChange={(e) =>

@@ -22,7 +22,7 @@ const ProfileSlider = ({ usersList }) => {
 						<div
 							className="flex-grow flex flex-col items-center justify-start gap-y-1 w-14"
 							onClick={() => selectChatHandler(user)}>
-							<div className="relative">
+							<div className="relative flex w-[52px] h-[52px]">
 								<Image
 									src={user.img.profilePicture}
 									alt={user.username}

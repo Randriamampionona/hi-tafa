@@ -46,7 +46,7 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 						<FaArrowLeft />
 					</span>
 				)}
-				<div className="relative w-[52px] h-[52px]">
+				<div className="relative flex w-[52px] h-[52px]">
 					<Image
 						src={profileImg || defaultInfos.photoURL}
 						alt={username || defaultInfos.displayName}

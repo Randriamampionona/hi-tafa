@@ -6,14 +6,9 @@ import {
 } from "firebase/storage";
 import { useState } from "react";
 import { storage } from "../lib/firebase.config";
-import { GlobalContext } from "../store/context/GlobalContext";
 import toastNotify from "../util/toast";
-import uuidGenerator from "./../util/uuidGenerator";
 
 const useUploadFile = () => {
-	const {
-		selectedChatInfos: { chatID },
-	} = GlobalContext();
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 
