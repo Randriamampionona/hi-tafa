@@ -9,11 +9,13 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../lib/firebase.config";
 import dateFormator from "../../util/dateFormator";
 import { FaBell } from "react-icons/fa";
+import { useRouter } from "next/router";
 
 const Chat = ({ chat }) => {
 	const { toogleSidebar } = GlobalContext();
 	const { currentUser } = AuthContext();
 	const { selectChatFun } = useSelectChat();
+	const { push } = useRouter();
 	const [active, setActive] = useState(false);
 
 	// get active status
@@ -36,15 +38,16 @@ const Chat = ({ chat }) => {
 	const selectChatHandler = async (selectedUser) => {
 		toogleSidebar();
 		await selectChatFun(selectedUser);
+		push("/");
 	};
 
 	return (
 		<div
-			className="relative flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10"
+			className="relative flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10 cursor-default"
 			onClick={() =>
 				selectChatHandler(getOtherUser?.(chat?.owners, currentUser))
 			}>
-			<div className="relative">
+			<div className="relative flex w-[52px] h-[52px]">
 				<Image
 					src={getOtherUser?.(chat?.owners, currentUser)?.img}
 					alt={getOtherUser?.(chat?.owners, currentUser)?.username}

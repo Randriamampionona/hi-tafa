@@ -34,18 +34,20 @@ const Message = ({ messageID, profileImg, email, msg, date }) => {
 			className={`flex items-start gap-x-3 w-full px-2 ${
 				email === currentUser?.email ? "justify-end" : "justify-start"
 			} ${isDeleting ? "opacity-50" : "opacity-100"}`}>
-			<Image
-				src={profileImg}
-				alt={email}
-				width={32}
-				height={32}
-				style={{ objectFit: "cover" }}
-				className={`rounded-full border-2 ${
-					email === currentUser?.email
-						? "order-2 border-greenBlue"
-						: "order-1 border-darkBlue"
-				}`}
-			/>
+			<div className="relative flex w-8 h-8">
+				<Image
+					src={profileImg}
+					alt={email}
+					width={32}
+					height={32}
+					style={{ objectFit: "cover" }}
+					className={`rounded-full border-2 ${
+						email === currentUser?.email
+							? "order-2 border-greenBlue"
+							: "order-1 border-darkBlue"
+					}`}
+				/>
+			</div>
 			<div
 				className={`max-w-[55%] ${
 					email === currentUser?.email

@@ -46,7 +46,7 @@ const ProfileBlock = ({ userProfileInfos }) => {
 				/>
 				{/* back btn */}
 				<span
-					className="absolute top-4 left-4 text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
+					className="absolute top-4 left-4 text-lg bg-darkWhite/40 p-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
 					onClick={() => push("/")}>
 					<FaArrowLeft />
 				</span>
