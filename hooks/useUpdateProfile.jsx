@@ -20,7 +20,9 @@ const useUpdateProfile = () => {
 	const updateImgFun = async (imgType, file) => {
 		setLoading((prev) => ({
 			...prev,
-			[imgType]: true,
+			[imgType === "profilePicture"
+				? "profilePicture"
+				: "coverPhoto"]: true,
 		}));
 
 		try {
@@ -53,7 +55,9 @@ const useUpdateProfile = () => {
 		} finally {
 			setLoading((prev) => ({
 				...prev,
-				[imgType]: false,
+				[imgType === "profilePicture"
+					? "profilePicture"
+					: "coverPhoto"]: false,
 			}));
 		}
 	};

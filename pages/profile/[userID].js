@@ -32,14 +32,14 @@ const UserProfilePage = ({ profileID, SSR__userProfileInfos }) => {
 				unsub();
 			};
 		};
-		profileID && getProfile;
+		profileID && getProfile();
 	}, [profileID]);
 
 	// swich between SSR inito CLIENT
 	const getUserProfileInfos = useCallback(() => {
 		if (client__userProfileInfos) return client__userProfileInfos;
 
-		return SSR__userProfileInfos;
+		return JSON.parse(SSR__userProfileInfos);
 	}, [SSR__userProfileInfos, client__userProfileInfos]);
 
 	return (
@@ -73,7 +73,7 @@ export const getServerSideProps = async (ctx) => {
 		const token = await admin.auth().verifyIdToken(cookies.user_token);
 
 		if (token) {
-			const { userID } = ctx.query;
+			const userID = ctx.query.userID;
 
 			const docRef = doc(db, "users", userID);
 			const userDoc = await getDoc(docRef);
@@ -82,7 +82,7 @@ export const getServerSideProps = async (ctx) => {
 				return {
 					props: {
 						profileID: userID,
-						SSR__userProfileInfos: userDoc.data(),
+						SSR__userProfileInfos: JSON.stringify(userDoc.data()),
 					},
 				};
 			}

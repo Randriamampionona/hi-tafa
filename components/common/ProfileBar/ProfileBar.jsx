@@ -46,14 +46,14 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 						<FaArrowLeft />
 					</span>
 				)}
-				<div className="relative">
+				<div className="relative w-[52px] h-[52px]">
 					<Image
 						src={profileImg || defaultInfos.photoURL}
 						alt={username || defaultInfos.displayName}
 						width={52}
 						height={52}
 						style={{ objectFit: "cover" }}
-						className="rounded-full border-2 border-greenBlue"
+						className="rounded-full border-2 border-greenBlue bg-darkWhite/10"
 					/>
 					{!isChatBox && <LoadingImg imgType={"profilePicture"} />}
 					{isChatBox && <AciveStatus isActive={active} onChatBox />}

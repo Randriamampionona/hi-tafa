@@ -3,10 +3,31 @@ import ChatList from "./ChatList";
 import Footer from "./Footer";
 import { AuthContext } from "../../store/context/AuthContext";
 import { GlobalContext } from "../../store/context/GlobalContext";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../../lib/firebase.config";
 
 const Sidebar = () => {
 	const { isSidebarOpen } = GlobalContext();
 	const { currentUser } = AuthContext();
+	const [infosProfile, setInfosProfile] = useState(null);
+
+	useEffect(() => {
+		const getInfos = () => {
+			const docRef = doc(db, "users", currentUser?.uid);
+			const unsub = onSnapshot(docRef, (snapshot) => {
+				if (snapshot.exists()) {
+					setInfosProfile(snapshot.data());
+				}
+			});
+
+			return () => {
+				unsub();
+			};
+		};
+
+		currentUser && getInfos();
+	}, [currentUser]);
 
 	return (
 		<aside
@@ -16,9 +37,11 @@ const Sidebar = () => {
 					: "min-w-0 max-w-0"
 			}`}>
 			<ProfileBar
-				username={currentUser?.displayName}
-				email={currentUser?.email}
-				profileImg={currentUser?.photoURL}
+				username={infosProfile?.username || currentUser?.displayName}
+				email={infosProfile?.email || currentUser?.email}
+				profileImg={
+					infosProfile?.img.profilePicture || currentUser?.photoURL
+				}
 			/>
 			<ChatList />
 			<Footer />

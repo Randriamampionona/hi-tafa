@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import Image from "next/legacy/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegEdit } from "react-icons/fa";
@@ -31,7 +32,7 @@ const TopBar = ({ userProfileInfos, showTopBar }) => {
 					exit="exit"
 					className="z-50 fixed left-0 top-0 flex items-center justify-between bg-lightWhite shadow shadow-darkBlue w-full h-14 px-2 md:px-3 lg:px-4 lg:w-[calc(100%-24rem)] lg:ml-96">
 					<div className="flex items-center space-x-2">
-						<div className="relative w-auto h-auto">
+						<div className="relative w-auto h-auto bg-darkWhite/10">
 							<Image
 								src={userProfileInfos?.img.profilePicture}
 								alt={userProfileInfos?.username}

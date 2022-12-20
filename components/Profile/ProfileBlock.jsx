@@ -47,13 +47,15 @@ const ProfileBlock = ({ userProfileInfos }) => {
 			<div className="z-20 absolute left-0 bottom-[-16.5rem] flex flex-col items-center justify-center w-full px-4 md:flex-row md:items-end md:justify-between md:bottom-[-7rem]">
 				{/* profile */}
 				<div className="order-1 flex flex-col items-center justify-center space-y-4 space-x-0 md:flex-row md:items-end md:justify-start md:space-y-0 md:space-x-4">
-					<figure className="relative w-36 h-36 rounded-full border-4 border-greenBlue">
+					<figure className="relative w-36 h-36 rounded-full border-4 border-greenBlue bg-darkWhite/10">
 						<Image
 							src={userProfileInfos?.img.profilePicture}
 							alt={userProfileInfos?.username}
 							layout="fill"
 							objectFit="cover"
-							className="w-full h-full !rounded-full hover:brightness-90"
+							width={144}
+							height={144}
+							className="!rounded-full hover:brightness-90"
 						/>
 						<LoadingImg imgType={"profilePicture"} />
 						<button
@@ -113,7 +115,9 @@ const ProfileBlock = ({ userProfileInfos }) => {
 
 				{/* btns */}
 				<div className="order-2 mb-3 md:order-3 md:mb-6">
-					<button className=" flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90">
+					<button
+						className=" flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90"
+						onClick={() => profilePictureRef?.current.click()}>
 						<span>
 							<FaRegEdit />
 						</span>
