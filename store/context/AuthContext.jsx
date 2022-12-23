@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
 		add: (token) => {
 			nookies.set(null, "user_token", token, {
 				path: "/",
-				maxAge: 60 * 60 * 60 * 24,
+				// maxAge: 60 * 60 * 60 * 48,
 			});
 		},
 		delete: () => {

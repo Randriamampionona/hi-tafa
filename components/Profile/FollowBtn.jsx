@@ -1,9 +1,10 @@
 import { Fragment } from "react";
 import { FaRss } from "react-icons/fa";
+import { RiUserUnfollowLine } from "react-icons/ri";
 import { ImSpinner2 } from "react-icons/im";
 import useFollow from "../../hooks/useFollow";
 
-const FollowBtn = ({ isCurrentUser, userProfileInfos }) => {
+const FollowBtn = ({ isCurrentUser, userProfileInfos, withCaption = true }) => {
 	const { followFunc, loading } = useFollow();
 
 	const followHandler = async () => {
@@ -28,15 +29,19 @@ const FollowBtn = ({ isCurrentUser, userProfileInfos }) => {
 			) : (
 				<Fragment>
 					<span>
-						<FaRss />
+						{userProfileInfos?.isFollowed ? (
+							<RiUserUnfollowLine />
+						) : (
+							<FaRss />
+						)}
 					</span>
-					{
+					{withCaption && (
 						<span>
 							{userProfileInfos?.isFollowed
 								? "Unfollow"
 								: "Follow"}
 						</span>
-					}
+					)}
 				</Fragment>
 			)}
 		</button>

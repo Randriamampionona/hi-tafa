@@ -80,7 +80,7 @@ const ChatList = () => {
 	return (
 		<div
 			id="sidebar__chat-list"
-			className="space-y-3"
+			className="relative space-y-3"
 			style={{ overflowY: "overlay" }}>
 			<Search />
 			<ProfileSlider usersList={usersList} />
