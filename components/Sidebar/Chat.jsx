@@ -7,7 +7,6 @@ import getOtherUser from "../../util/getOtherUser";
 import { AuthContext } from "../../store/context/AuthContext";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../lib/firebase.config";
-import dateFormator from "../../util/dateFormator";
 import { FaBell } from "react-icons/fa";
 import { useRouter } from "next/router";
 
@@ -80,9 +79,7 @@ const Chat = ({ chat }) => {
 						</h3>
 						<small className="italic ml-2">
 							&nbsp;•&nbsp;
-							{dateFormator?.(
-								chat?.lastMessage.when?.toDate()?.toString()
-							)}
+							{chat?.lastMessage.when}
 						</small>
 					</div>
 				)}

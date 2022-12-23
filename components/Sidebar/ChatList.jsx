@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { db } from "../../lib/firebase.config";
 import { AuthContext } from "../../store/context/AuthContext";
+import dateFormator from "../../util/dateFormator";
 import getOtherUser from "../../util/getOtherUser";
 import Chat from "./Chat";
 import ProfileSlider from "./ProfileSlider";
@@ -50,6 +51,13 @@ const ChatList = () => {
 			const unsub = onSnapshot(q, (snapshot) => {
 				const chatsArrays = snapshot.docs.map((doc) => ({
 					...doc.data(),
+					lastMessage: {
+						...doc.data().lastMessage,
+						when: dateFormator(
+							doc.data().lastMessage.when?.toDate().toString(),
+							"ago"
+						),
+					},
 				}));
 				const filteredChats = chatsArrays?.filter((chat) => {
 					if (

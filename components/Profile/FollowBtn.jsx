@@ -15,10 +15,10 @@ const FollowBtn = ({ isCurrentUser, userProfileInfos }) => {
 	return (
 		<button
 			disabled={loading}
-			className={`flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite  ${
+			className={`flex items-center gap-x-2 px-4 py-2 rounded-md text-lightWhite  ${
 				userProfileInfos?.isFollowed
-					? "shadow shadow-darkWhite bg-darkWhite hover:bg-darkWhite/90 disabled:cursor-progress"
-					: "shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90 disabled:cursor-progress"
+					? "shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90 disabled:cursor-progress"
+					: "shadow shadow-greenBlue bg-greenBlue hover:bg-greenBlue/90 disabled:cursor-progress"
 			}`}
 			onClick={followHandler}>
 			{loading ? (

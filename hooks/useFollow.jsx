@@ -1,5 +1,5 @@
 import toastNotify from "./../util/toast";
-import { addDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase.config";
 import { AuthContext } from "../store/context/AuthContext";
 import { useState } from "react";
@@ -34,7 +34,7 @@ const useFollow = () => {
 						},
 					};
 
-					await addDoc(docRef, data);
+					await setDoc(docRef, data);
 					return toastNotify("success", "Follow");
 				}
 

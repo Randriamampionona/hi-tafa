@@ -14,6 +14,7 @@ import {
 	query,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase.config";
+import dateFormator from "../../util/dateFormator";
 
 const initChatState = {
 	receiverData: null,
@@ -68,7 +69,10 @@ const ChatBox = () => {
 					messages: snapshot.docs.map((doc) => ({
 						...doc.data(),
 						messageID: doc.id,
-						date: doc.data()?.date?.toDate().toString(),
+						date: dateFormator(
+							doc.data()?.date?.toDate().toString(),
+							"default"
+						),
 					})),
 				}));
 			});
