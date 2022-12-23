@@ -1,10 +1,11 @@
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import Image from "next/legacy/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaArrowLeft, FaRegEdit } from "react-icons/fa";
 import useUpdateProfile from "../../hooks/useUpdateProfile";
 import { LoadingImg } from "../common";
 import { useRouter } from "next/router";
+import FollowBtn from "./FollowBtn";
 
 const variants = {
 	initial: { y: "-6rem", opacity: 0 },
@@ -15,7 +16,7 @@ const variants = {
 	exit: { y: "-6rem", opacity: 0 },
 };
 
-const TopBar = ({ userProfileInfos, showTopBar }) => {
+const TopBar = ({ userProfileInfos, isCurrentUser, showTopBar }) => {
 	const { updateImgFun } = useUpdateProfile();
 	const { push } = useRouter();
 	const inpRef = useRef(null);
@@ -65,25 +66,37 @@ const TopBar = ({ userProfileInfos, showTopBar }) => {
 						</div>
 					</div>
 
-					<button
-						className="flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90"
-						onClick={() => inpRef?.current.click()}>
-						<span>
-							<FaRegEdit />
-						</span>
-						<span>Edit profile</span>
-					</button>
+					{isCurrentUser ? (
+						<Fragment>
+							<button
+								className="flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90"
+								onClick={() => inpRef?.current.click()}>
+								<span>
+									<FaRegEdit />
+								</span>
+								<span>Edit profile</span>
+							</button>
 
-					<input
-						hidden
-						type="file"
-						accept=".jpg, .jpeg, .png"
-						ref={inpRef}
-						className="hidden"
-						onChange={(e) =>
-							pickFileHandler("profilePicture", e.target.files[0])
-						}
-					/>
+							<input
+								hidden
+								type="file"
+								accept=".jpg, .jpeg, .png"
+								ref={inpRef}
+								className="hidden"
+								onChange={(e) =>
+									pickFileHandler(
+										"profilePicture",
+										e.target.files[0]
+									)
+								}
+							/>
+						</Fragment>
+					) : (
+						<FollowBtn
+							isCurrentUser={isCurrentUser}
+							userProfileInfos={userProfileInfos}
+						/>
+					)}
 				</motion.div>
 			)}
 		</AnimatePresence>

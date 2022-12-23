@@ -2,11 +2,23 @@ import { Sidebar } from "../../components/Sidebar";
 import { useCallback, useEffect, useState } from "react";
 import nookies from "nookies";
 import admin from "./../../lib/firebaseAdmin.config";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase.config";
 import { Posts, ProfileBlock, TopBar } from "../../components/Profile";
+import { AuthContext } from "../../store/context/AuthContext";
 
-const UserProfilePage = ({ profileID, SSR__userProfileInfos }) => {
+const UserProfilePage = ({
+	profileID,
+	isCurrentUser,
+	SSR__userProfileInfos,
+}) => {
+	const { currentUser } = AuthContext();
 	const [showTopBar, SetTopBar] = useState(false);
 	const [client__userProfileInfos, SetClient__UserProfileInfos] =
 		useState(null);
@@ -18,22 +30,50 @@ const UserProfilePage = ({ profileID, SSR__userProfileInfos }) => {
 		});
 	}, []);
 
-	// get profile snapshot
+	// get profile/followers snapshot
 	useEffect(() => {
 		const getProfile = () => {
 			const docRef = doc(db, "users", profileID);
-			const unsub = onSnapshot(docRef, (snapshot) => {
+			const collectionRef = collection(
+				db,
+				"users",
+				profileID,
+				"followers"
+			);
+
+			const unsub1 = onSnapshot(docRef, (snapshot) => {
 				if (snapshot.exists()) {
-					SetClient__UserProfileInfos(snapshot.data());
+					SetClient__UserProfileInfos((prev) => ({
+						...prev,
+						...snapshot.data(),
+					}));
+				}
+			});
+
+			const unsub2 = onSnapshot(collectionRef, (snapshot) => {
+				if (snapshot.docs.map((doc) => doc.exists())) {
+					const followers = snapshot.docs.map((doc) =>
+						doc.exists() ? doc.data() : []
+					);
+
+					SetClient__UserProfileInfos((prev) => ({
+						...prev,
+						followers,
+						isFollowed:
+							followers.findIndex(
+								(f) => f.userID === currentUser.uid
+							) !== -1,
+					}));
 				}
 			});
 
 			return () => {
-				unsub();
+				unsub1();
+				SetClient__UserProfileInfos && unsub2();
 			};
 		};
-		profileID && getProfile();
-	}, [profileID]);
+		currentUser && profileID && getProfile();
+	}, [currentUser, profileID]);
 
 	// swich between SSR inito CLIENT
 	const getUserProfileInfos = useCallback(() => {
@@ -50,16 +90,23 @@ const UserProfilePage = ({ profileID, SSR__userProfileInfos }) => {
 
 			<section className="relative flex-grow flex-shrink w-full p-2 ml-0 md:p-3 lg:w-[calc(100%-24rem)] lg:ml-96 lg:p-4">
 				{/* profile block */}
-				<ProfileBlock userProfileInfos={getUserProfileInfos?.()} />
+				<ProfileBlock
+					isCurrentUser={isCurrentUser}
+					userProfileInfos={getUserProfileInfos?.()}
+				/>
 
 				{/* top bar */}
 				<TopBar
+					isCurrentUser={isCurrentUser}
 					userProfileInfos={getUserProfileInfos?.()}
 					showTopBar={showTopBar}
 				/>
 
 				{/* photos (posts) */}
-				<Posts userProfileInfos={getUserProfileInfos?.()} />
+				<Posts
+					isCurrentUser={isCurrentUser}
+					userProfileInfos={getUserProfileInfos?.()}
+				/>
 			</section>
 		</main>
 	);
@@ -76,13 +123,28 @@ export const getServerSideProps = async (ctx) => {
 			const userID = ctx.query.userID;
 
 			const docRef = doc(db, "users", userID);
+			const collectionRef = collection(db, "users", userID, "followers");
+
 			const userDoc = await getDoc(docRef);
+			const followersDoc = await getDocs(collectionRef);
+
+			const followers = followersDoc.docs.map((doc) =>
+				doc.exists() ? doc.data() : []
+			);
 
 			if (userDoc.exists()) {
 				return {
 					props: {
 						profileID: userID,
-						SSR__userProfileInfos: JSON.stringify(userDoc.data()),
+						isCurrentUser: userID === token.uid,
+						SSR__userProfileInfos: JSON.stringify({
+							...userDoc.data(),
+							followers,
+							isFollowed:
+								followers.findIndex(
+									(f) => f.userID === token.uid
+								) !== -1,
+						}),
 					},
 				};
 			}
@@ -97,8 +159,7 @@ export const getServerSideProps = async (ctx) => {
 	} catch (error) {
 		return {
 			props: {
-				profileID: userID,
-				SSR__userProfileInfos: null,
+				notFound: true,
 			},
 		};
 	}

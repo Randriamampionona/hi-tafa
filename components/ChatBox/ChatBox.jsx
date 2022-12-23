@@ -12,7 +12,6 @@ import {
 	onSnapshot,
 	orderBy,
 	query,
-	serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase.config";
 
@@ -26,7 +25,6 @@ const initChatState = {
 			text: "",
 			media: null,
 		},
-		date: serverTimestamp(),
 	},
 };
 
@@ -63,13 +61,14 @@ const ChatBox = () => {
 	useEffect(() => {
 		const getReceiverData = () => {
 			const docRef = collection(db, "chats", chatID, "messages");
-			const q = query(docRef, orderBy("date", "asc"));
+			const q = query(docRef, orderBy("messageID", "asc"));
 			const unsub = onSnapshot(q, (snapshot) => {
 				setChatData((prev) => ({
 					...prev,
 					messages: snapshot.docs.map((doc) => ({
-						messageID: doc.id,
 						...doc.data(),
+						messageID: doc.id,
+						date: doc.data()?.date?.toDate().toString(),
 					})),
 				}));
 			});
@@ -90,7 +89,6 @@ const ChatBox = () => {
 				text: "",
 				media: null,
 			},
-			date: new Date().toString(),
 		});
 	};
 

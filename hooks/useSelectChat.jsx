@@ -70,6 +70,7 @@ const useSelectChat = () => {
 					},
 				],
 				lastMessage: {
+					messageID: 0,
 					sender: {
 						id: "",
 						email: "",

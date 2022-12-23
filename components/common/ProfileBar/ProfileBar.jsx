@@ -23,7 +23,10 @@ const defaultInfos = {
 };
 
 const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
-	const { toogleSidebar } = GlobalContext();
+	const {
+		toogleSidebar,
+		selectedChatInfos: { receiverID },
+	} = GlobalContext();
 	const { currentUser } = AuthContext();
 	const { updateImgFun } = useUpdateProfile();
 	const { push } = useRouter();
@@ -31,6 +34,12 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 
 	const pickFileHandler = async (imgType, file) => {
 		await updateImgFun(imgType, file);
+	};
+
+	const pushHandler = () => {
+		isChatBox
+			? push(`/profile/${receiverID}`)
+			: push(`/profile/${currentUser?.uid}`);
 	};
 
 	return (
@@ -46,7 +55,9 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 						<FaArrowLeft />
 					</span>
 				)}
-				<div className="relative flex w-[52px] h-[52px]">
+				<div
+					className="relative flex w-[52px] h-[52px]"
+					onClick={pushHandler}>
 					<Image
 						src={profileImg || defaultInfos.photoURL}
 						alt={username || defaultInfos.displayName}
@@ -60,7 +71,9 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 				</div>
 
 				<div>
-					<p className="font-bold text-lg leading-none">
+					<p
+						className="font-bold text-lg leading-none cursor-pointer"
+						onClick={pushHandler}>
 						{username || defaultInfos.displayName}
 					</p>
 					<h3 className="font-normal text-sm text-darkWhite cursor-default hover:text-greenBlue">
@@ -94,7 +107,7 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 					</span>
 					<span
 						className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20"
-						onClick={() => push(`/profile/${currentUser.uid}`)}>
+						onClick={pushHandler}>
 						<FaEdit />
 					</span>
 					<input

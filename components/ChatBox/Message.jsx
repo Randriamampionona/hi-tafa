@@ -1,85 +1,95 @@
 /* eslint-disable @next/next/no-img-element */
 import Image from "next/image";
 import { AuthContext } from "../../store/context/AuthContext";
-import dateFormator from "./../../util/dateFormator";
 import useDeleteMessage from "./../../hooks/useDeleteMessage";
 import { useState } from "react";
+import toastNotify from "../../util/toast";
 
-const messageModel = {
-	profileImg: "",
-	email: "",
-	msg: {
-		text: "",
-		media: null,
-	},
-	date: new Date().toString(),
-};
+// const messageModel = {
+// 	profileImg: "",
+// 	email: "",
+// 	msg: {
+// 		text: "",
+// 		media: null,
+// 	},
+// };
 
-const Message = ({ messageID, profileImg, email, msg, date }) => {
+const Message = ({ message }) => {
 	const { currentUser } = AuthContext();
 	const { isDeleting, deleteMessageFun } = useDeleteMessage();
 	const [openDeleteBox, setOpenDeleteBox] = useState(false);
 
-	const openBoxHandler = () => setOpenDeleteBox(true);
+	const openBoxHandler = () => {
+		currentUser?.email === message?.email && setOpenDeleteBox(true);
+	};
 
 	const closeBoxHandler = () => setOpenDeleteBox(false);
 
 	const deleteMessageHandler = async () => {
-		await deleteMessageFun(messageID);
-		closeBoxHandler();
+		if (currentUser?.email === message?.email) {
+			await deleteMessageFun(message?.messageID);
+			return closeBoxHandler();
+		}
+
+		return toastNotify("error", "Cannot delete this message");
 	};
 
 	return (
 		<div
 			className={`flex items-start gap-x-3 w-full px-2 ${
-				email === currentUser?.email ? "justify-end" : "justify-start"
+				message?.email === currentUser?.email
+					? "justify-start flex-row-reverse"
+					: "justify-start"
 			} ${isDeleting ? "opacity-50" : "opacity-100"}`}>
+			{/* sender img */}
 			<div className="relative flex w-8 h-8">
 				<Image
-					src={profileImg}
-					alt={email}
+					src={message?.profileImg}
+					alt={message?.email}
 					width={32}
 					height={32}
 					style={{ objectFit: "cover" }}
 					className={`rounded-full border-2 ${
-						email === currentUser?.email
-							? "order-2 border-greenBlue"
-							: "order-1 border-darkBlue"
+						message?.email === currentUser?.email
+							? "border-greenBlue"
+							: "border-darkBlue"
 					}`}
 				/>
 			</div>
+
+			{/* message */}
 			<div
 				className={`max-w-[55%] ${
-					email === currentUser?.email
-						? "self-end justify-end order-1"
-						: "self-start justify-start order-2"
+					message?.email === currentUser?.email
+						? "self-end justify-end"
+						: "self-start justify-start"
 				}`}
 				onDoubleClick={openBoxHandler}>
 				<div
 					className={`text-start text-lightWhite ${
-						msg?.media ? "p-1" : "p-4"
+						message?.msg?.media ? "p-1" : "p-4"
 					} ${
-						email === currentUser?.email
+						message?.email === currentUser?.email
 							? "bg-greenBlue rounded-senderRadius"
 							: "bg-darkBlue rounded-reciverRadius"
 					}`}>
-					{msg?.media ? (
+					{message?.msg?.media ? (
 						<div className="space-y-2">
 							<img
 								loading="lazy"
-								src={msg?.media}
-								alt={msg?.media}
+								src={message?.msg?.media}
+								alt={message?.msg?.media}
 								style={{ objectFit: "cover" }}
 								className="rounded-md"
 							/>
-							<p>{msg?.text}</p>
+							<p>{message?.msg?.text}</p>
 						</div>
 					) : (
-						<p>{msg?.text}</p>
+						<p>{message?.msg?.text}</p>
 					)}
 				</div>
 				<span className="text-darkBlue/70 text-xs">
-					<i>{dateFormator?.(date)}</i>
+					<i>{message?.date}</i>
 				</span>
 			</div>
 

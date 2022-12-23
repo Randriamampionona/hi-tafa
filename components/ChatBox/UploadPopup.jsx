@@ -5,7 +5,10 @@ import useSendMessage from "../../hooks/useSendMessage";
 import useUploadFile from "../../hooks/useUploadFile";
 import { AuthContext } from "../../store/context/AuthContext";
 import { GlobalContext } from "../../store/context/GlobalContext";
+import toastNotify from "../../util/toast";
 import uuidGenerator from "../../util/uuidGenerator";
+
+const fileSize = 3000000;
 
 const UploadPopup = ({
 	resetInputMessage,
@@ -24,6 +27,15 @@ const UploadPopup = ({
 	const inputRef = useRef(null);
 
 	const chooseFileHandler = async (file) => {
+		if (file.size > fileSize) {
+			toastNotify(
+				"error",
+				"File too large, please choose an image less than 3MB"
+			);
+
+			return closePopupHandler();
+		}
+
 		const path = `chat/${chatID}/${uuidGenerator?.()} - ${file?.name}`;
 		const downloadURL = await uploadFileFun(file, path);
 
@@ -37,7 +49,6 @@ const UploadPopup = ({
 				text: prev.msg.text,
 				media: downloadURL?.url,
 			},
-			date: new Date().toString(),
 		}));
 	};
 

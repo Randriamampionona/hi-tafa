@@ -20,14 +20,14 @@ const ChatInput = ({
 				text: e.target.value,
 				media: null,
 			},
-			date: new Date().toString(),
 		});
 	};
 
 	const sendHandler = async (e) => {
 		e.preventDefault();
 
-		inputMessage.msg.text?.trim() && (await sendMessageFunc(inputMessage));
+		(inputMessage.msg.text?.trim() || inputMessage.msg.media) &&
+			(await sendMessageFunc(inputMessage));
 
 		resetInputMessage();
 	};

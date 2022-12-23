@@ -1,18 +1,19 @@
 import Image from "next/legacy/image";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { FaArrowLeft, FaCamera, FaRegEdit } from "react-icons/fa";
 import useUpdateProfile from "../../hooks/useUpdateProfile";
 import { LoadingImg } from "../common";
+import FollowBtn from "./FollowBtn";
 
-const ProfileBlock = ({ userProfileInfos }) => {
+const ProfileBlock = ({ isCurrentUser, userProfileInfos }) => {
 	const { updateImgFun } = useUpdateProfile();
 	const coverPhotoRef = useRef(null);
 	const profilePictureRef = useRef(null);
 	const { push } = useRouter();
 
 	const pickFileHandler = async (imgType, file) => {
-		await updateImgFun(imgType, file);
+		isCurrentUser && (await updateImgFun(imgType, file));
 	};
 
 	return (
@@ -26,24 +27,30 @@ const ProfileBlock = ({ userProfileInfos }) => {
 					objectFit="cover"
 				/>
 				<LoadingImg imgType={"coverPhoto"} />
-				<button
-					className="z-30 absolute bottom-4 right-4 flex items-center gap-x-1 p-2 rounded-md bg-lightWhite text-darkBlue hover:bg-lightWhite/90"
-					onClick={() => coverPhotoRef?.current.click()}>
-					<span>
-						<FaCamera />
-					</span>
-					<span className="hidden sm:block">Edit cover photo</span>
-				</button>
-				<input
-					hidden
-					type="file"
-					className="hidden"
-					accept=".jpg, .jpeg, .png"
-					ref={coverPhotoRef}
-					onChange={(e) =>
-						pickFileHandler("coverPhoto", e.target.files[0])
-					}
-				/>
+				{isCurrentUser && (
+					<Fragment>
+						<button
+							className="z-30 absolute bottom-4 right-4 flex items-center gap-x-1 p-2 rounded-md bg-lightWhite text-darkBlue hover:bg-lightWhite/90"
+							onClick={() => coverPhotoRef?.current.click()}>
+							<span>
+								<FaCamera />
+							</span>
+							<span className="hidden sm:block">
+								Edit cover photo
+							</span>
+						</button>
+						<input
+							hidden
+							type="file"
+							className="hidden"
+							accept=".jpg, .jpeg, .png"
+							ref={coverPhotoRef}
+							onChange={(e) =>
+								pickFileHandler("coverPhoto", e.target.files[0])
+							}
+						/>
+					</Fragment>
+				)}
 				{/* back btn */}
 				<span
 					className="absolute top-4 left-4 text-lg bg-darkWhite/40 p-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
@@ -66,27 +73,33 @@ const ProfileBlock = ({ userProfileInfos }) => {
 							height={144}
 							className="!rounded-full hover:brightness-90 bg-darkWhite/10"
 						/>
-						<LoadingImg imgType={"profilePicture"} />
-						<button
-							className="z-10 absolute bottom-[7px] right-[3px] p-2 rounded-full shadow shadow-darkBlue bg-darkBlue text-lightWhite hover:bg-darkBlue/90"
-							onClick={() => profilePictureRef?.current.click()}>
-							<span>
-								<FaCamera />
-							</span>
-						</button>
-						<input
-							hidden
-							type="file"
-							accept=".jpg, .jpeg, .png"
-							className="hidden"
-							ref={profilePictureRef}
-							onChange={(e) =>
-								pickFileHandler(
-									"profilePicture",
-									e.target.files[0]
-								)
-							}
-						/>
+						{isCurrentUser && (
+							<Fragment>
+								<LoadingImg imgType={"profilePicture"} />
+								<button
+									className="z-10 absolute bottom-[7px] right-[3px] p-2 rounded-full shadow shadow-darkBlue bg-darkBlue text-lightWhite hover:bg-darkBlue/90"
+									onClick={() =>
+										profilePictureRef?.current.click()
+									}>
+									<span>
+										<FaCamera />
+									</span>
+								</button>
+								<input
+									hidden
+									type="file"
+									accept=".jpg, .jpeg, .png"
+									className="hidden"
+									ref={profilePictureRef}
+									onChange={(e) =>
+										pickFileHandler(
+											"profilePicture",
+											e.target.files[0]
+										)
+									}
+								/>
+							</Fragment>
+						)}
 					</figure>
 
 					<div className="flex flex-col text-center leading-none !mb-6 md:text-start">
@@ -109,7 +122,7 @@ const ProfileBlock = ({ userProfileInfos }) => {
 					</div>
 					<div className="flex flex-col items-center justify-center text-center md:space-x-2 md:flex-row">
 						<span className="text-darkBlue text-lg font-medium">
-							0
+							{userProfileInfos?.followers?.length}
 						</span>
 						<span className="text-sm text-darkBlue/50">
 							Followers
@@ -125,14 +138,21 @@ const ProfileBlock = ({ userProfileInfos }) => {
 
 				{/* btns */}
 				<div className="order-2 mb-3 md:order-3 md:mb-6">
-					<button
-						className=" flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90"
-						onClick={() => profilePictureRef?.current.click()}>
-						<span>
-							<FaRegEdit />
-						</span>
-						<span>Edit profile</span>
-					</button>
+					{isCurrentUser ? (
+						<button
+							className=" flex items-center gap-x-1 px-4 py-2 rounded-md text-lightWhite shadow shadow-darkBlue bg-darkBlue hover:bg-darkBlue/90"
+							onClick={() => profilePictureRef?.current.click()}>
+							<span>
+								<FaRegEdit />
+							</span>
+							<span>Edit profile</span>
+						</button>
+					) : (
+						<FollowBtn
+							isCurrentUser={isCurrentUser}
+							userProfileInfos={userProfileInfos}
+						/>
+					)}
 				</div>
 			</div>
 		</div>

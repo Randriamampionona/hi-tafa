@@ -16,7 +16,7 @@ const Chat = ({ messages }) => {
 			});
 		}, 100);
 
-		return () => timiID
+		return () => timiID;
 	}, [messages?.length, chatID]);
 
 	return (
@@ -25,7 +25,7 @@ const Chat = ({ messages }) => {
 			className="flex-grow grid items-end gap-y-8 px-3 pt-3 pb-8 overflow-x-hidden"
 			style={{ overflowY: "overlay" }}>
 			{messages?.map((message) => (
-				<Message key={message.messageID} {...message} />
+				<Message key={message.messageID} message={message} />
 			))}
 			<div className="h-0 w-full" ref={scrollReff} />
 		</div>

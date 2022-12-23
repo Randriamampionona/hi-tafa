@@ -2,6 +2,7 @@ import {
 	addDoc,
 	collection,
 	doc,
+	getDoc,
 	serverTimestamp,
 	updateDoc,
 } from "firebase/firestore";
@@ -25,13 +26,24 @@ const useSendMessage = () => {
 			const collectionRef = collection(db, "chats", chatID, "messages");
 			const lastMsgRef = doc(db, "chats", chatID);
 
-			if (chatID && data.msg.text !== "") {
+			if (chatID && (data.msg.text !== "" || data.msg.media)) {
+				// get last message ID
+				const getLastMessage = await getDoc(lastMsgRef);
+				const lastMessageID = getLastMessage.exists()
+					? Number(getLastMessage.data()?.lastMessage.messageID) + 1
+					: 1;
+
 				// sending message
-				await addDoc(collectionRef, data);
+				await addDoc(collectionRef, {
+					...data,
+					messageID: lastMessageID,
+					date: serverTimestamp(),
+				});
 
 				// updating last message (isSeen, sender, message)
 				await updateDoc(lastMsgRef, {
 					lastMessage: {
+						messageID: lastMessageID,
 						sender: {
 							id: currentUser?.uid,
 							email: currentUser?.email,
