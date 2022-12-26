@@ -35,6 +35,7 @@ const handler = async (req, res) => {
 			// update last message (isSeen)
 			await chatRef.update({
 				["lastMessage.isSeen"]: true,
+				createdAt: admin.firestore.FieldValue.serverTimestamp(),
 			});
 
 			// return chat infos
