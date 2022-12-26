@@ -20,12 +20,8 @@ const initChatState = {
 	receiverData: null,
 	messages: [],
 	message: {
-		profileImg: "",
-		email: "",
-		msg: {
-			text: "",
-			media: null,
-		},
+		text: "",
+		media: null,
 	},
 };
 
@@ -68,7 +64,7 @@ const ChatBox = () => {
 					...prev,
 					messages: snapshot.docs.map((doc) => ({
 						...doc.data(),
-						messageID: doc.id,
+						docID: doc.id,
 						date: dateFormator(
 							doc.data()?.date?.toDate().toString(),
 							"default"
@@ -87,12 +83,8 @@ const ChatBox = () => {
 
 	const resetInputMessage = () => {
 		setInputMessage({
-			profileImg: "",
-			email: "",
-			msg: {
-				text: "",
-				media: null,
-			},
+			text: "",
+			media: null,
 		});
 	};
 

@@ -1,8 +1,7 @@
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
-import { db } from "../lib/firebase.config";
 import { GlobalContext } from "../store/context/GlobalContext";
 import toastNotify from "../util/toast";
+import axios from "axios";
 
 const useDeleteMessage = () => {
 	const {
@@ -10,19 +9,36 @@ const useDeleteMessage = () => {
 	} = GlobalContext();
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const deleteMessageFun = async (messageID) => {
+	const deleteMessageFun = async (message) => {
 		setIsDeleting(true);
 
 		try {
-			const messageRef = doc(db, "chats", chatID, "messages", messageID);
+			const fetch = await axios.delete("/api/v1/chat/deleteMessage", {
+				message_infos: { chatID, ...message },
+			});
+			const result = fetch.data;
 
-			const isMessage = await getDoc(messageRef);
-
-			if (isMessage.exists()) {
-				await deleteDoc(messageRef);
-
-				toastNotify?.("success", "Message has been deleted");
+			if (result.success) {
+				return toastNotify?.("success", result.message);
 			}
+
+			throw new Error("error", result.message);
+
+			// const messageRef = doc(
+			// 	db,
+			// 	"chats",
+			// 	chatID,
+			// 	"messages",
+			// 	message.docID
+			// );
+
+			// const isMessage = await getDoc(messageRef);
+
+			// if (isMessage.exists()) {
+			// 	await deleteDoc(messageRef);
+
+			// 	toastNotify?.("success", "Message has been deleted");
+			// }
 		} catch (error) {
 			toastNotify?.("error", error.message);
 		} finally {

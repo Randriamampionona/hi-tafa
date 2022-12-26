@@ -42,7 +42,7 @@ const Chat = ({ chat }) => {
 
 	return (
 		<div
-			className="relative flex items-center gap-x-4 px-3 py-2 hover:bg-darkWhite/10 cursor-default"
+			className="relative flex items-center space-x-4 px-3 py-2 hover:bg-darkWhite/10 cursor-default"
 			onClick={() =>
 				selectChatHandler(getOtherUser?.(chat?.owners, currentUser))
 			}>

@@ -1,9 +1,9 @@
 import Head from "next/head";
 
-const MetaHead = () => {
+const MetaHead = ({ subTitle }) => {
 	return (
 		<Head>
-			<title>Hi-Tafa</title>
+			<title>{!subTitle ? "Hi-Tafa" : `Hi-Tafa | ${subTitle}`}</title>
 			<link rel="icon" href="/assets/favicon.png" />
 		</Head>
 	);

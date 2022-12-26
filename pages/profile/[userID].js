@@ -1,5 +1,5 @@
 import { Sidebar } from "../../components/Sidebar";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import nookies from "nookies";
 import admin from "./../../lib/firebaseAdmin.config";
 import {
@@ -12,6 +12,7 @@ import {
 import { db } from "../../lib/firebase.config";
 import { Posts, ProfileBlock, TopBar } from "../../components/Profile";
 import { AuthContext } from "../../store/context/AuthContext";
+import { MetaHead } from "../../components/common";
 
 const UserProfilePage = ({
 	profileID,
@@ -83,32 +84,36 @@ const UserProfilePage = ({
 	}, [SSR__userProfileInfos, client__userProfileInfos]);
 
 	return (
-		<main className="relative flex w-full min-h-screen overflow-x-hidden">
-			<section className="fixed top-0 w-auto h-auto max-h-screen hidden lg:block">
-				<Sidebar />
-			</section>
+		<Fragment>
+			<MetaHead subTitle={getUserProfileInfos()?.username} />
 
-			<section className="relative flex-grow flex-shrink w-full p-2 ml-0 md:p-3 lg:w-[calc(100%-24rem)] lg:ml-96 lg:p-4">
-				{/* profile block */}
-				<ProfileBlock
-					isCurrentUser={isCurrentUser}
-					userProfileInfos={getUserProfileInfos?.()}
-				/>
+			<main className="relative flex w-full min-h-screen overflow-x-hidden">
+				<section className="fixed top-0 w-auto h-auto max-h-screen hidden lg:block">
+					<Sidebar />
+				</section>
 
-				{/* top bar */}
-				<TopBar
-					isCurrentUser={isCurrentUser}
-					userProfileInfos={getUserProfileInfos?.()}
-					showTopBar={showTopBar}
-				/>
+				<section className="relative flex-grow flex-shrink w-full p-2 ml-0 md:p-3 lg:w-[calc(100%-24rem)] lg:ml-96 lg:p-4">
+					{/* profile block */}
+					<ProfileBlock
+						isCurrentUser={isCurrentUser}
+						userProfileInfos={getUserProfileInfos?.()}
+					/>
 
-				{/* photos (posts) */}
-				<Posts
-					isCurrentUser={isCurrentUser}
-					userProfileInfos={getUserProfileInfos?.()}
-				/>
-			</section>
-		</main>
+					{/* top bar */}
+					<TopBar
+						isCurrentUser={isCurrentUser}
+						userProfileInfos={getUserProfileInfos?.()}
+						showTopBar={showTopBar}
+					/>
+
+					{/* photos (posts) */}
+					<Posts
+						isCurrentUser={isCurrentUser}
+						userProfileInfos={getUserProfileInfos?.()}
+					/>
+				</section>
+			</main>
+		</Fragment>
 	);
 };
 
@@ -117,7 +122,9 @@ export default UserProfilePage;
 export const getServerSideProps = async (ctx) => {
 	try {
 		const cookies = nookies.get(ctx);
-		const token = await admin.auth().verifyIdToken(cookies.user_token);
+		const token = await admin
+			.auth()
+			.verifyIdToken(cookies[process.env.NEXT_PUBLIC_TOKEN_NAME]);
 
 		if (token) {
 			const userID = ctx.query.userID;
@@ -158,9 +165,7 @@ export const getServerSideProps = async (ctx) => {
 		}
 	} catch (error) {
 		return {
-			props: {
-				notFound: true,
-			},
+			notFound: true,
 		};
 	}
 };

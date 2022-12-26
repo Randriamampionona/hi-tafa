@@ -23,7 +23,7 @@ const ProfileSlider = ({ usersList }) => {
 				{usersList?.map((user) => (
 					<SwiperSlide key={user.userID}>
 						<div
-							className="flex-grow flex flex-col items-center justify-start gap-y-1 w-14 cursor-pointer"
+							className="flex-grow flex flex-col items-center justify-start space-y-1 w-14 cursor-pointer"
 							onClick={() => selectChatHandler(user)}>
 							<div className="relative flex w-[52px] h-[52px]">
 								<Image

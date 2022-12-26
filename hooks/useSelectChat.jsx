@@ -1,95 +1,97 @@
-import {
-	setDoc,
-	doc,
-	getDoc,
-	updateDoc,
-	serverTimestamp,
-} from "firebase/firestore";
-import { db } from "../lib/firebase.config";
-import { AuthContext } from "../store/context/AuthContext";
 import { GlobalContext } from "../store/context/GlobalContext";
 import toastNotify from "../util/toast";
-import getOtherUser from "./../util/getOtherUser";
+import axios from "axios";
 
 const useSelectChat = () => {
 	const { setChatInfos } = GlobalContext();
-	const { currentUser } = AuthContext();
 
-	const selectChatFun = async ({ userID, email, ...rest }) => {
+	const selectChatFun = async (choosenUser) => {
 		try {
-			if (currentUser.uid === userID) {
-				return toastNotify("error", "can't talk to yourself");
+			const fetch = await axios.post(
+				"/api/v1/chat/selectChat",
+				choosenUser
+			);
+			const result = fetch.data;
+
+			if (result.success) {
+				return setChatInfos(result.payload);
 			}
 
-			// generate doc ID
-			const combinedID =
-				currentUser.uid > userID
-					? `${currentUser.uid}-and-${userID}`
-					: `${userID}-and-${currentUser.uid}`;
+			throw new Error(result.message);
 
-			// doc refs
-			const chatRef = doc(db, "chats", combinedID);
+			// if (currentUser.uid === userID) {
+			// 	return toastNotify("error", "can't talk to yourself");
+			// }
 
-			const chats = await getDoc(chatRef);
+			// // generate custome doc ID
+			// const combinedID =
+			// 	currentUser.uid > userID
+			// 		? `${currentUser.uid}-and-${userID}`
+			// 		: `${userID}-and-${currentUser.uid}`;
 
-			// return if chat already exist and set chat infos
-			if (chats.exists()) {
-				// set chat here
-				setChatInfos({
-					chatID: chats.data()?.chatID,
-					receiverID: getOtherUser?.(
-						chats.data()?.owners,
-						currentUser
-					)?.userID,
-				});
+			// // doc refs
+			// const chatRef = doc(db, "chats", combinedID);
 
-				// update last message (isSeen)
-				await updateDoc(chatRef, {
-					["lastMessage.isSeen"]: true,
-				});
+			// const chats = await getDoc(chatRef);
 
-				return toastNotify("success", "Chat already exist");
-			}
+			// // return if chat already exist and set chat infos
+			// if (chats.exists()) {
+			// 	// set chat here
+			// 	setChatInfos({
+			// 		chatID: chats.data()?.chatID,
+			// 		receiverID: getOtherUser?.(
+			// 			chats.data()?.owners,
+			// 			currentUser
+			// 		)?.userID,
+			// 	});
 
-			// create chat if never exist
-			const chatData = {
-				chatID: combinedID,
-				createdAt: serverTimestamp(),
-				owners: [
-					{
-						email: currentUser.email,
-						img: currentUser.photoURL,
-						userID: currentUser.uid,
-						username: currentUser.displayName,
-					},
-					{
-						userID,
-						email,
-						img: rest.img.profilePicture,
-						username: rest.username,
-					},
-				],
-				lastMessage: {
-					messageID: 0,
-					sender: {
-						id: "",
-						email: "",
-					},
-					message: "",
-					isSeen: true,
-					when: serverTimestamp(),
-				},
-			};
+			// 	// update last message (isSeen)
+			// 	await updateDoc(chatRef, {
+			// 		["lastMessage.isSeen"]: true,
+			// 	});
 
-			await setDoc(chatRef, chatData);
+			// 	return toastNotify("success", "Chat already exist");
+			// }
 
-			// set chat infos after all
-			setChatInfos({
-				chatID: combinedID,
-				receiverID: userID,
-			});
+			// // create chat if never exist
+			// const chatData = {
+			// 	chatID: combinedID,
+			// 	createdAt: serverTimestamp(),
+			// 	owners: [
+			// 		{
+			// 			email: currentUser.email,
+			// 			img: currentUser.photoURL,
+			// 			userID: currentUser.uid,
+			// 			username: currentUser.displayName,
+			// 		},
+			// 		{
+			// 			userID,
+			// 			email,
+			// 			img: profilePicture,
+			// 			username,
+			// 		},
+			// 	],
+			// 	lastMessage: {
+			// 		messageID: 0,
+			// 		sender: {
+			// 			id: "",
+			// 			email: "",
+			// 		},
+			// 		message: "",
+			// 		isSeen: true,
+			// 		when: serverTimestamp(),
+			// 	},
+			// };
 
-			return toastNotify("success", `Chat created`);
+			// await setDoc(chatRef, chatData);
+
+			// // set chat infos after all
+			// setChatInfos({
+			// 	chatID: combinedID,
+			// 	receiverID: userID,
+			// });
+
+			// return toastNotify("success", `Chat created`);
 		} catch (error) {
 			toastNotify("error", error.message);
 		} finally {

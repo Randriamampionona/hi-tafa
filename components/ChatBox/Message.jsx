@@ -27,7 +27,7 @@ const Message = ({ message }) => {
 
 	const deleteMessageHandler = async () => {
 		if (currentUser?.email === message?.email) {
-			await deleteMessageFun(message?.messageID);
+			await deleteMessageFun(message);
 			return closeBoxHandler();
 		}
 
@@ -74,7 +74,7 @@ const Message = ({ message }) => {
 							: "bg-darkBlue rounded-reciverRadius"
 					}`}>
 					{message?.msg?.media ? (
-						<div className="space-y-2">
+						<div>
 							<img
 								loading="lazy"
 								src={message?.msg?.media}
@@ -82,7 +82,7 @@ const Message = ({ message }) => {
 								style={{ objectFit: "cover" }}
 								className="rounded-md"
 							/>
-							<p>{message?.msg?.text}</p>
+							<p className="mt-2">{message?.msg?.text}</p>
 						</div>
 					) : (
 						<p>{message?.msg?.text}</p>

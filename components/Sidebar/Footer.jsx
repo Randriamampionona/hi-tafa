@@ -10,9 +10,9 @@ const Footer = () => {
 	};
 
 	return (
-		<div className="flex items-center justify-center gap-x-3 px-3 py-1 bg-[#21364b]">
+		<div className="flex items-center justify-center space-x-3 px-3 py-1 bg-[#21364b]">
 			<button
-				className="flex-grow flex items-center justify-center gap-x-3 rounded py-2 hover:bg-darkWhite/20"
+				className="flex-grow flex items-center justify-center space-x-3 rounded py-2 hover:bg-darkWhite/20"
 				onClick={signoutHandler}>
 				{authLoading.signout ? (
 					<span className="animate-spin">
@@ -28,7 +28,7 @@ const Footer = () => {
 				)}
 			</button>
 
-			<button className="flex-grow flex items-center justify-center gap-x-3 rounded py-2 hover:bg-darkWhite/20">
+			<button className="flex-grow flex items-center justify-center space-x-3 rounded py-2 hover:bg-darkWhite/20">
 				<span>
 					<FaCog />
 				</span>

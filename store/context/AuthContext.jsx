@@ -58,13 +58,13 @@ export const AuthProvider = ({ children }) => {
 
 	const cookieHandler = {
 		add: (token) => {
-			nookies.set(null, "user_token", token, {
+			nookies.set(null, process.env.NEXT_PUBLIC_TOKEN_NAME, token, {
 				path: "/",
 				// maxAge: 60 * 60 * 60 * 48,
 			});
 		},
 		delete: () => {
-			nookies.destroy(null, "user_token");
+			nookies.destroy(null, process.env.NEXT_PUBLIC_TOKEN_NAME);
 		},
 	};
 

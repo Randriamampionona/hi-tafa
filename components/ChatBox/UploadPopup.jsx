@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import { FaImages, FaTimes } from "react-icons/fa";
 import useSendMessage from "../../hooks/useSendMessage";
 import useUploadFile from "../../hooks/useUploadFile";
-import { AuthContext } from "../../store/context/AuthContext";
 import { GlobalContext } from "../../store/context/GlobalContext";
 import toastNotify from "../../util/toast";
 import uuidGenerator from "../../util/uuidGenerator";
@@ -19,7 +18,6 @@ const UploadPopup = ({
 	const {
 		selectedChatInfos: { chatID },
 	} = GlobalContext();
-	const { currentUser } = AuthContext();
 	const { isUploading, uploadFileFun, removeFileFunc, isDeleting } =
 		useUploadFile();
 	const { sendMessageFunc, isSending } = useSendMessage();
@@ -42,37 +40,23 @@ const UploadPopup = ({
 		setFilePath(downloadURL?.path);
 
 		setInputMessage((prev) => ({
-			...prev,
-			profileImg: currentUser.photoURL,
-			email: currentUser.email,
-			msg: {
-				text: prev.msg.text,
-				media: downloadURL?.url,
-			},
+			text: prev.text,
+			media: downloadURL?.url,
 		}));
 	};
 
 	const changeHandler = (e) => {
 		setInputMessage((prev) => ({
 			...prev,
-			msg: {
-				...prev.msg,
-				text: e.target.value,
-			},
+			text: e.target.value,
 		}));
 	};
 
 	const clearFileHandler = async () => {
-		if (inputMessage.msg.media) {
+		if (inputMessage.media) {
 			await removeFileFunc(filePath);
 
-			setInputMessage((prev) => ({
-				...prev,
-				msg: {
-					text: "",
-					media: null,
-				},
-			}));
+			resetInputMessage();
 		}
 	};
 
@@ -102,11 +86,11 @@ const UploadPopup = ({
 
 				<div className="relative grid place-items-center w-full h-48 my-2 bg-darkWhite/20 rounded border border-darkWhite/50">
 					{/* file picker */}
-					{inputMessage.msg.media ? (
+					{inputMessage.media ? (
 						<div className="w-full h-full">
 							<Image
-								src={inputMessage.msg.media}
-								alt={inputMessage.msg.media}
+								src={inputMessage.media}
+								alt={inputMessage.media}
 								fill={true}
 								style={{ objectFit: "contain" }}
 								className="rounded"
@@ -114,7 +98,7 @@ const UploadPopup = ({
 						</div>
 					) : (
 						<div
-							className="flex flex-col items-center w-full h-full justify-center gap-y-3 cursor-pointer"
+							className="flex flex-col items-center w-full h-full justify-center space-y-3 cursor-pointer"
 							onClick={() => inputRef?.current.click()}>
 							<span className="text-3xl text-lightWhite">
 								<FaImages />
@@ -126,7 +110,7 @@ const UploadPopup = ({
 					)}
 
 					{/* remove image */}
-					{inputMessage.msg.media && (
+					{inputMessage.media && (
 						<span
 							className="z-10 absolute top-2 right-2 text-lightWhite p-1 rounded-full bg-darkWhite/10 hover:bg-darkWhite/20"
 							onClick={clearFileHandler}>
@@ -135,13 +119,13 @@ const UploadPopup = ({
 					)}
 
 					{/* message input */}
-					{inputMessage.msg.media && (
+					{inputMessage.media && (
 						<input
 							autoFocus
 							type="text"
 							placeholder="message..."
 							className="z-10 absolute bottom-2 bg-lightWhite border-0 outline-0 rounded px-3 h-8 w-[80%] mx-auto focus-within:border-1 focus-within:border-greenBlue"
-							value={inputMessage.msg.text}
+							value={inputMessage.text}
 							onChange={changeHandler}
 						/>
 					)}
@@ -156,7 +140,7 @@ const UploadPopup = ({
 					/>
 				</div>
 
-				<div className="flex items-center justify-end gap-x-2 w-full">
+				<div className="flex items-center justify-end space-x-2 w-full">
 					<button
 						disabled={isSending || isUploading || isDeleting}
 						className="rounded text-lightWhite px-3 h-8 hover:bg-darkWhite/20 disabled:bg-darkWhite/20 disabled:cursor-progress"

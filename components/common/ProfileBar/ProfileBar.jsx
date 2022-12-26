@@ -47,10 +47,10 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 			className={`flex items-center justify-between p-3 border-b border-darkWhite/20 ${
 				isChatBox ? "bg-lightWhite" : "bg-darkBlue"
 			}`}>
-			<div className="flex items-center gap-x-2">
+			<div className="flex items-center space-x-2">
 				{isChatBox && (
 					<span
-						className="text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 md:hidden"
+						className="text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 lg:hidden"
 						onClick={toogleSidebar}>
 						<FaArrowLeft />
 					</span>
@@ -83,7 +83,7 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 			</div>
 
 			{isChatBox ? (
-				<div className="flex items-center gap-x-3">
+				<div className="flex items-center space-x-3">
 					<span className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-greenBlue/20 hidden md:block">
 						<FaFacebook />
 					</span>
@@ -99,7 +99,7 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 					</span>
 				</div>
 			) : (
-				<div className="flex items-center gap-x-3">
+				<div className="flex items-center space-x-3">
 					<span
 						className="text-lg bg-darkWhite/10 p-3 rounded-full cursor-pointer hover:bg-darkWhite/20"
 						onClick={() => inpRef?.current.click()}>

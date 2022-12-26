@@ -25,10 +25,7 @@ const Search = () => {
 		e.preventDefault();
 		if (!!inpValue.trim()) {
 			const collectionRef = collection(db, "users");
-			const q = query(
-				collectionRef,
-				where("email", "==", inpValue)
-			);
+			const q = query(collectionRef, where("email", "==", inpValue));
 			const resultDoc = await getDocs(q);
 
 			if (resultDoc.empty) {
@@ -87,7 +84,7 @@ const Search = () => {
 											key={user?.userID}
 											className="flex items-center justify-between space-x-4 py-2">
 											<div
-												className="flex items-center gap-x-2"
+												className="flex items-center space-x-2"
 												onClick={() =>
 													selectChatHandler(user)
 												}>

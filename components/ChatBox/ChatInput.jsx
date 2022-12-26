@@ -1,5 +1,4 @@
 import { FaImages, FaPaperPlane } from "react-icons/fa";
-import { AuthContext } from "../../store/context/AuthContext";
 import useSendMessage from "./../../hooks/useSendMessage";
 import { ImSpinner2 } from "react-icons/im";
 
@@ -9,24 +8,19 @@ const ChatInput = ({
 	setInputMessage,
 	setOpenPopup,
 }) => {
-	const { currentUser } = AuthContext();
 	const { sendMessageFunc, isSending } = useSendMessage();
 
 	const changeHandler = (e) => {
 		setInputMessage({
-			profileImg: currentUser?.photoURL,
-			email: currentUser?.email,
-			msg: {
-				text: e.target.value,
-				media: null,
-			},
+			text: e.target.value,
+			media: null,
 		});
 	};
 
 	const sendHandler = async (e) => {
 		e.preventDefault();
 
-		(inputMessage.msg.text?.trim() || inputMessage.msg.media) &&
+		(inputMessage.text?.trim() || inputMessage.media) &&
 			(await sendMessageFunc(inputMessage));
 
 		resetInputMessage();
@@ -40,7 +34,7 @@ const ChatInput = ({
 				type="text"
 				placeholder="Write your message..."
 				className="flex-grow px-3 h-full bg-transparent border-0 outline-0"
-				value={inputMessage.msg.text}
+				value={inputMessage.text}
 				onChange={changeHandler}
 			/>
 			<div className="flex items-center h-full">
