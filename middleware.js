@@ -5,46 +5,32 @@ const baseURL =
 		? "https://hi-tafa.vercel.app/"
 		: "http://localhost:3000/";
 
-const authPages = [baseURL, `${baseURL}profile`];
-
-const noAuthPages = [`${baseURL}authorization`];
-
 const middleware = async (req) => {
 	const user_token = req.cookies.get(
 		process.env.NEXT_PUBLIC_TOKEN_NAME
 	)?.value;
-	const URL = req.url;
+	const URL = req.nextUrl.pathname;
 
-	try {
-		// skip if url doesn't require auth/no-auth
-		if (
-			!authPages.includes(URL) &&
-			!noAuthPages.includes(URL) &&
-			!URL.includes(`${baseURL}profile/`)
-		)
-			return;
+	// api call to check if either user is loggedIn
+	const result = await fetch(`${baseURL}api/v1/auth/verifyToken`, {
+		headers: { user_token },
+	}).then((res) => res.json());
 
-		const result = await fetch(`${baseURL}api/v1/auth/verifyToken`, {
-			headers: { user_token },
-		}).then((res) => res.json());
-
-		console.log("middleware run");
-
-		if (noAuthPages.includes(URL) && result.success) {
-			return NextResponse.redirect(baseURL);
-		}
-
-		if (authPages.includes(URL) && result.error) {
-			return NextResponse.redirect(`${baseURL}authorization`);
-		}
-
-		// for specifique route
-		if (URL.includes(`${baseURL}profile/`) && result.error) {
-			return NextResponse.redirect(`${baseURL}authorization`);
-		}
-	} catch (error) {
+	if (URL.startsWith("/") && !result?.isAuth) {
 		return NextResponse.redirect(`${baseURL}authorization`);
+	}
+
+	if (URL.startsWith("/profile") && !result?.isAuth) {
+		return NextResponse.redirect(`${baseURL}authorization`);
+	}
+
+	if (URL.startsWith("/authorization") && result?.isAuth) {
+		return NextResponse.redirect(`${baseURL}`);
 	}
 };
 
 export default middleware;
+
+export const config = {
+	matcher: ["/authorization", "/", "/profile/:path*"],
+};
