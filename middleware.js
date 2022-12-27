@@ -12,21 +12,21 @@ const middleware = async (req) => {
 	const URL = req.nextUrl.pathname;
 
 	// api call to check if either user is loggedIn
-	const result = await fetch(`${baseURL}api/v1/auth/verifyToken`, {
-		headers: { user_token },
-	}).then((res) => res.json());
+	// const result = await fetch(`${baseURL}api/v1/auth/verifyToken`, {
+	// 	headers: { user_token },
+	// }).then((res) => res.json());
 
-	if (URL.startsWith("/") && !result?.isAuth) {
-		return NextResponse.redirect(`${baseURL}authorization`);
-	}
+	// if (result?.isAuth && URL.startsWith("/authorization")) {
+	// 	return NextResponse.redirect(`http://localhost:3000`);
+	// }
 
-	if (URL.startsWith("/profile") && !result?.isAuth) {
-		return NextResponse.redirect(`${baseURL}authorization`);
-	}
+	// if (!result?.isAuth && URL.startsWith("/")) {
+	// 	return NextResponse.redirect(`http://localhost:3000/authorization`);
+	// }
 
-	if (URL.startsWith("/authorization") && result?.isAuth) {
-		return NextResponse.redirect(`${baseURL}`);
-	}
+	// if (!result?.isAuth && URL.startsWith("/profile")) {
+	// 	return NextResponse.redirect(`http://localhost:3000/authorization`);
+	// }
 };
 
 export default middleware;
