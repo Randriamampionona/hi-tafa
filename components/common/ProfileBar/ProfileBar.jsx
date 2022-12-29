@@ -49,12 +49,14 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 			}`}>
 			<div className="flex items-center space-x-2">
 				{isChatBox && (
+					// back btn
 					<span
 						className="text-lg bg-darkWhite/10 p-3 mr-3 rounded-full cursor-pointer hover:bg-greenBlue/20 lg:hidden"
 						onClick={toogleSidebar}>
 						<FaArrowLeft />
 					</span>
 				)}
+				{/* img */}
 				<div
 					className="relative flex w-[52px] h-[52px]"
 					onClick={pushHandler}>
@@ -70,13 +72,14 @@ const ProfileBar = ({ profileImg, username, email, active, isChatBox }) => {
 					{isChatBox && <AciveStatus isActive={active} onChatBox />}
 				</div>
 
+				{/* name/email */}
 				<div>
 					<p
-						className="font-bold text-lg leading-none cursor-pointer"
+						className="font-bold text-lg leading-none cursor-pointer w-[75%] truncate"
 						onClick={pushHandler}>
 						{username || defaultInfos.displayName}
 					</p>
-					<h3 className="font-normal text-sm text-darkWhite cursor-default hover:text-greenBlue">
+					<h3 className="font-normal text-sm text-darkWhite cursor-default hover:text-greenBlue w-[75%] truncate">
 						{email}
 					</h3>
 				</div>

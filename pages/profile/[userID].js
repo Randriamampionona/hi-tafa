@@ -107,10 +107,13 @@ const UserProfilePage = ({
 					/>
 
 					{/* photos (posts) */}
-					<Posts
+					{/* <Posts
 						isCurrentUser={isCurrentUser}
 						userProfileInfos={getUserProfileInfos?.()}
-					/>
+					/> */}
+					<p className="w-full text-sm text-darkBlue text-center mt-8">
+						Empty post
+					</p>
 				</section>
 			</main>
 		</Fragment>

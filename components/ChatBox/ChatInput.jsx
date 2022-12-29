@@ -40,7 +40,7 @@ const ChatInput = ({
 			<div className="flex items-center h-full">
 				<button
 					type="button"
-					className="grid place-items-center h-full w-12 bg-darkBlue hover:bg-darkBlue/90"
+					className="flex items-center justify-center h-full w-12 bg-darkBlue hover:bg-darkBlue/90"
 					onClick={(e) => {
 						e.stopPropagation();
 						setOpenPopup(true);
@@ -52,7 +52,7 @@ const ChatInput = ({
 
 				<button
 					disabled={isSending}
-					className="grid place-items-center h-full w-12 bg-greenBlue hover:bg-greenBlue/90 disabled:cursor-progress">
+					className="flex items-center justify-center h-full w-12 bg-greenBlue hover:bg-greenBlue/90 disabled:cursor-progress">
 					{isSending ? (
 						<span className="animate-spin">
 							<ImSpinner2 />

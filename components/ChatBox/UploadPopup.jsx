@@ -124,7 +124,7 @@ const UploadPopup = ({
 							autoFocus
 							type="text"
 							placeholder="message..."
-							className="z-10 absolute bottom-2 bg-lightWhite border-0 outline-0 rounded px-3 h-8 w-[80%] mx-auto focus-within:border-1 focus-within:border-greenBlue"
+							className="z-10 absolute bottom-2 left-1/2 -translate-x-1/2 bg-lightWhite border-0 outline-0 rounded px-3 h-8 w-[80%] mx-auto focus-within:border-1 focus-within:border-greenBlue"
 							value={inputMessage.text}
 							onChange={changeHandler}
 						/>

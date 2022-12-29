@@ -5,28 +5,40 @@ const baseURL =
 		? "https://hi-tafa.vercel.app/"
 		: "http://localhost:3000/";
 
+const verifyTokenHandler = async (req) => {
+	try {
+		const fetcher = await fetch(`${baseURL}/api/v1/auth/verifyToken`, {
+			credentials: "include",
+			headers: {
+				user_token: req.cookies.get("user_token")?.value,
+			},
+		});
+		const result = await fetcher.json();
+
+		return result;
+	} catch (error) {
+		// back to auth page if some error occured
+		return NextResponse.redirect(`${baseURL}authorization`);
+	}
+};
+
 const middleware = async (req) => {
-	const user_token = req.cookies.get(
-		process.env.NEXT_PUBLIC_TOKEN_NAME
-	)?.value;
 	const URL = req.nextUrl.pathname;
 
-	// api call to check if either user is loggedIn
-	// const result = await fetch(`${baseURL}api/v1/auth/verifyToken`, {
-	// 	headers: { user_token },
-	// }).then((res) => res.json());
+	const { isTokenVerified } = await verifyTokenHandler(req);
 
-	// if (result?.isAuth && URL.startsWith("/authorization")) {
-	// 	return NextResponse.redirect(`http://localhost:3000`);
-	// }
+	// redirect to home if signed in
+	if (URL.startsWith("/authorization") && isTokenVerified) {
+		return NextResponse.redirect(baseURL);
+	}
 
-	// if (!result?.isAuth && URL.startsWith("/")) {
-	// 	return NextResponse.redirect(`http://localhost:3000/authorization`);
-	// }
-
-	// if (!result?.isAuth && URL.startsWith("/profile")) {
-	// 	return NextResponse.redirect(`http://localhost:3000/authorization`);
-	// }
+	// redirect to authorization if not signed in
+	if (
+		(URL.startsWith("/profile") && !isTokenVerified) ||
+		(URL === "/" && !isTokenVerified)
+	) {
+		return NextResponse.redirect(`${baseURL}authorization`);
+	}
 };
 
 export default middleware;
